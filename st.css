@@ -418,6 +418,44 @@ button { font: inherit; color: inherit; }
 .st-doc b { color: var(--white); font-weight: 600; }
 .st-doc a { color: var(--lime); }
 
+/* ---------- Real photos from kkcreate.in ---------- */
+.st-work { padding-top: 0; }
+.st-work-track { gap: 14px; }
+.st-work-card { flex: 0 0 min(80vw, 340px); scroll-snap-align: start; background: var(--ink-3); }
+.st-work-card img { width: 100%; height: 230px; object-fit: cover; object-position: 50% 25%; }
+.st-work-card figcaption { padding: 16px 18px 20px; }
+.st-work-card b { display: block; font-family: var(--head); font-weight: 400; font-size: 24px; line-height: 1.15; text-transform: uppercase; color: var(--lime); }
+.st-work-card span { display: block; margin-top: 6px; font-size: 16px; line-height: 1.45; color: var(--mute); }
+
+.st-cover-img { width: calc(100% + 44px); max-width: none; height: 190px; margin: -22px -22px 18px; object-fit: cover; object-position: 50% 22%; }
+
+.st-mentor-photo img { aspect-ratio: 5 / 4; object-position: 50% 20%; }
+.st-kavya { display: flex; align-items: center; gap: 16px; padding: 12px; border-left: 0; }
+.st-kavya img { flex: none; width: 110px; height: 86px; object-fit: cover; object-position: 50% 30%; }
+
+.st-team { padding-block: 0 26px; overflow: hidden; background: var(--ink); }
+.st-team-track { display: flex; gap: 10px; width: max-content; animation: st-slide 46s linear infinite; }
+.st-team-track img { flex: none; width: auto; height: clamp(170px, 26vw, 260px); }
+.st-team-note { margin-top: 14px; padding-inline: 20px; font-family: var(--tag); font-weight: 700; font-size: 15px; text-align: center; color: var(--mute); }
+
+.st-welcome { position: relative; margin-top: clamp(32px, 5vw, 48px); margin-right: 8px; box-shadow: 8px 8px 0 var(--lime); }
+.st-welcome img { width: 100%; height: clamp(200px, 40vw, 380px); object-fit: cover; object-position: 50% 30%; }
+.st-welcome figcaption { padding: 14px 18px; background: var(--ink-3); }
+.st-welcome b { font-family: var(--head); font-weight: 400; font-size: 26px; text-transform: uppercase; color: var(--lime); }
+.st-welcome span { display: block; color: var(--mute); }
+
+.st-box-wrap { display: grid; gap: 18px; }
+.st-box-img { width: 100%; height: clamp(170px, 42vw, 260px); object-fit: cover; object-position: 50% 40%; }
+
+@media (min-width: 960px) {
+  .st-work-track { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; margin-inline: 0; padding-inline: 0; }
+  .st-work-card { flex: none; }
+  .st-mentor-in { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-team-track { animation: none; }
+}
+
 /* ---------- Wider screens ---------- */
 @media (min-width: 640px) {
   .st-facts { grid-template-columns: repeat(4, auto); justify-content: space-between; }
