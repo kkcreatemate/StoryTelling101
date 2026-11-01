@@ -6,9 +6,8 @@
 
 const TY = {
   // WhatsApp community. Updates, bonuses and Q&A.
-  // TODO: paste the Storytelling 101 group's invite link. While it is empty
-  // the Join buttons keep their authored #community href.
-  whatsappUrl: '',
+  // Storytelling 101 community group.
+  whatsappUrl: 'https://chat.whatsapp.com/CqYcZZQzPmuLRfqi5WPTZp',
 
   // The Complete Creator Package offer page. Its own CTA goes to TagMango.
   otoUrl: '/stoto',
