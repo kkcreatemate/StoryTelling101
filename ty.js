@@ -1,0 +1,196 @@
+/* Thank-you pages (/tystory and /tykhazana) for Storytelling 101:
+   link wiring with UTM passthrough, the one-time-offer
+   countdown and the referral copy button.
+
+   Everything below no-ops when its markup is absent. */
+
+const TY = {
+  // WhatsApp community. Updates, bonuses and Q&A.
+  // TODO: paste the Storytelling 101 group's invite link. While it is empty
+  // the Join buttons keep their authored #community href.
+  whatsappUrl: '',
+
+  // The Complete Creator Package offer page. Its own CTA goes to TagMango.
+  otoUrl: '/stoto',
+
+  // Learning portal. Sign-in is by the email or phone used at checkout,
+  // with an OTP, which is why no page here promises a password.
+  lmsUrl: 'https://learn.kkcreate.in',
+
+  // Support WhatsApp. The number is shown on the page too, so keep the two
+  // in step if it ever changes.
+  supportNumber: '+91 8700105418',
+  supportUrl: 'https://wa.me/918700105418',
+
+  // What the referral button copies: the landing page, plain. Hard-coded
+  // rather than derived from window.location, so it stays the public URL
+  // even when this page is opened from a preview host or with tracking
+  // params on it.
+  //
+  // It stays opted out of param forwarding (see wire() below). Inheriting
+  // whatever brought the buyer here would credit every referred signup to
+  // the referrer's ad, which is the opposite of the point — so a student
+  // sharing this passes on a clean link.
+  //
+  // Empty hides the referral card.
+  referralUrl: 'https://storytelling.kkcreate.in/',
+
+  /* How long the offer stays open per visitor, from the moment they first
+     see it — which is normally /stoto, since that is the page checkout
+     lands on. The deadline is stored in localStorage, so refreshing does not
+     restart the clock — and because /stoto and the strip on this page are
+     the same offer, they share one deadline under one key.
+
+     At zero only the countdown goes: the strip and its button stay live,
+     because a dead clock next to a working CTA reads as a bug.
+
+     KEEP IN STEP WITH oto.js: minutes and the key are duplicated there
+     rather than pulled from a shared file, which would cost every page an
+     extra request. If you change one, change the other. */
+  otoMinutes: 8
+};
+
+const OTO_CLOCK_KEY = 'st-oto-end';
+
+/* ---------- Links ---------- */
+
+/* Whatever params this page was opened with (TagMango forwards the UTMs
+   through its redirect) continue on to the offer page, so the upsell sale
+   is attributed to the same source as the original. */
+function withPageParams(url) {
+  const page = new URLSearchParams(window.location.search);
+  if (![...page.keys()].length) return url;
+  const target = new URL(url, window.location.href);
+  page.forEach((value, key) => {
+    if (!target.searchParams.has(key)) target.searchParams.set(key, value);
+  });
+  return target.toString();
+}
+
+/* An unset URL leaves the element's authored href alone rather than
+   pointing it at nothing — see the pending links listed in the README.
+
+   Params are forwarded by default, so a link added later is tracked unless
+   someone deliberately says otherwise. The opt-outs below are the
+   destinations that cannot record a UTM, where appending one only makes the
+   URL longer and dirtier. */
+function wire(selector, url, opts) {
+  if (!url) return;
+  const { passParams = true, newTab = true } = opts || {};
+  document.querySelectorAll(selector).forEach(el => {
+    el.href = passParams ? withPageParams(url) : url;
+    if (newTab) { el.target = '_blank'; el.rel = 'noopener'; }
+  });
+}
+
+/* No params on the two WhatsApp links: a chat.whatsapp.com group invite and
+   a wa.me deep link both drop everything they do not recognise, so there is
+   nothing on the other side to read a UTM — and a group invite gets pasted
+   around, which is the last URL that wants tracking on it. */
+wire('[data-wa]', TY.whatsappUrl, { passParams: false });
+wire('[data-support]', TY.supportUrl, { passParams: false });
+
+// The portal is ours, so this one is worth attributing. It is the stub
+// button and the quick card on the pass as well as the sign-in pill.
+wire('[data-lms]', TY.lmsUrl);
+
+wire('[data-oto]', TY.otoUrl, { newTab: false });
+
+/* The support button shows the number itself — someone who would rather
+   save it than tap through should not have to open WhatsApp to read it. */
+document.querySelectorAll('[data-support-number]').forEach(el => {
+  el.textContent = TY.supportNumber;
+});
+
+/* ---------- One-time-offer countdown ---------- */
+
+/* Storage can be unavailable outright, not just unwritable: in Safari's
+   private mode and wherever site data is blocked, reading it throws too. An
+   uncaught throw here would leave the clock frozen on its markup
+   placeholder, which is the one state this strip cannot afford. */
+function readDeadline() {
+  try { return parseInt(localStorage.getItem(OTO_CLOCK_KEY), 10) || 0; }
+  catch (e) { return 0; }
+}
+
+function writeDeadline(end) {
+  try { localStorage.setItem(OTO_CLOCK_KEY, String(end)); } catch (e) { /* private mode */ }
+}
+
+function initOtoClock() {
+  const strip = document.querySelector('[data-oto-strip]');
+  if (!strip) return;
+
+  /* Normally the clock is already running by the time anyone reads this
+     strip: checkout lands on /stoto, which issues the deadline, and this
+     page is where they arrive after declining it. The fallback covers the
+     other route in — someone reopening this page from their history, or a
+     visitor whose storage was cleared between the two.
+
+     Either way it is issued once and then left alone: refreshing never buys
+     another minute, and one that has already lapsed stays lapsed here.
+     Reissuing is /stoto's job, not this page's — someone who bounces off
+     the offer and comes back should not find the clock wound back. */
+  let end = readDeadline();
+  if (!end) {
+    end = Date.now() + TY.otoMinutes * 60000;
+    writeDeadline(end);
+  }
+
+  const hEl = strip.querySelector('[data-clock-h]');
+  const mEl = strip.querySelector('[data-clock-m]');
+  const sEl = strip.querySelector('[data-clock-s]');
+  const hUnit = strip.querySelector('[data-unit-h]');
+  const pad = n => String(n).padStart(2, '0');
+
+  /* Only the countdown expires. The strip and its button carry on working,
+     so at zero the clock is removed rather than the offer being closed off
+     — a dead 00:00 next to a live CTA reads as a bug. Runs on the first
+     tick too, so someone returning after their window has lapsed lands
+     straight in this state. */
+  function expire() {
+    strip.querySelectorAll('[data-timer]').forEach(el => { el.hidden = true; });
+  }
+
+  function tick() {
+    const left = Math.max(0, end - Date.now());
+    const hrs = Math.floor(left / 3600000);
+    if (hUnit) hUnit.hidden = hrs === 0;
+    if (hEl) hEl.textContent = pad(hrs);
+    if (mEl) mEl.textContent = pad(Math.floor(left / 60000) % 60);
+    if (sEl) sEl.textContent = pad(Math.floor(left / 1000) % 60);
+    if (left <= 0) {
+      expire();
+      clearInterval(timer);
+    }
+  }
+
+  const timer = setInterval(tick, 1000);
+  tick();
+}
+initOtoClock();
+
+/* ---------- Referral copy ---------- */
+
+function initReferral() {
+  const btn = document.querySelector('[data-referral]');
+  if (!btn) return;
+  /* No public landing page URL yet means nothing to share, so the whole
+     card goes rather than leaving a heading above a dead button. */
+  if (!TY.referralUrl) {
+    const card = btn.closest('[data-referral-card]');
+    if (card) card.hidden = true;
+    return;
+  }
+  const label = btn.textContent;
+  btn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(TY.referralUrl);
+      btn.textContent = 'Copied!';
+    } catch (e) {
+      btn.textContent = 'Copy failed';
+    }
+    setTimeout(() => { btn.textContent = label; }, 2000);
+  });
+}
+initReferral();

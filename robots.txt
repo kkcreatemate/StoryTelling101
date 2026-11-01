@@ -1,0 +1,15 @@
+# Open to search engines: the landing page and the policies. Everything
+# else is closed by the catch-all Disallow below without being named here,
+# so this file does not point anyone at pages not meant to be found.
+# Stylesheets, scripts and images stay open so pages render.
+User-agent: *
+Allow: /$
+Allow: /index.html$
+Allow: /privacy
+Allow: /terms
+Allow: /assets/
+Allow: /*.css$
+Allow: /*.js$
+Disallow: /
+
+Sitemap: https://storytelling.kkcreate.in/sitemap.xml
