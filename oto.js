@@ -1,37 +1,41 @@
-/* One-time-offer page (/stoto): Kahani Ka Khazana, offered after the
-   Storytelling 101 workshop checkout. */
+/* The two one-time-offer pages for Storytelling 101, in the order buyers
+   see them:
+
+     /bundle  Content Creator Bundle  (first offer, straight after checkout)
+     /stoto   Reel Creation Playbook  (second offer)
+
+   Each page names its own offer on <body>, so this one file serves both:
+
+     data-oto-checkout   the offer's TagMango checkout link. While it is
+                         empty every [data-buy] keeps its authored `#get`
+                         href and scrolls to the offer card instead of
+                         sending anyone to a dead page.
+     data-oto-decline    where "No thanks" goes: the next offer, or the
+                         thank-you page after the last one.
+     data-oto-key        the localStorage key for this offer's countdown.
+
+   The checkout links live here, in one place:
+     TODO: paste both TagMango checkout links. */
+const OTO_LINKS = {
+  bundle: '',
+  playbook: ''
+};
+
+const OTO_BODY = document.body.dataset;
 
 const OTO = {
-  /* TODO: paste the Kahani Ka Khazana TagMango checkout link. A different product
-     from the workshop seat, so this is not the landing page's link.
-
-     If it is ever emptied again, every [data-buy] keeps its authored
-     `#get` href and simply scrolls to the offer card, rather than sending
-     anyone to a dead page. */
-  checkoutUrl: '',
-
-  /* Where "I'll figure it out myself" goes: the plain thank-you page. This
-     page is where the workshop checkout lands, so declining is the only way
-     most buyers reach their confirmation — it is the exit from the funnel,
-     not a dead end, and the seat is already paid for either way. */
-  declineUrl: '/tystory',
+  checkoutUrl: OTO_LINKS[OTO_BODY.otoOffer] || '',
+  declineUrl: OTO_BODY.otoDecline || '/tystory',
 
   /* How long the offer stays open per visitor, from the moment they first
-     see it — normally this page, since checkout redirects here before the
-     thank-you page.
-
-     A deadline that has already lapsed is reissued when this page loads:
-     the offer is worth more live than spent, so someone coming back later
-     gets a new window rather than a dead 00:00. Renewing writes the shared
-     key, so the thank-you strip reads as live again too.
-
-     KEEP IN STEP WITH ty.js: otoMinutes and the key are duplicated there
-     rather than pulled from a shared file, which would cost every page an
-     extra request. If you change one, change the other. */
+     see it. A lapsed deadline is reissued when the page loads, so someone
+     coming back later gets a new window rather than a dead 00:00. The
+     /tystory strip reads the Playbook's key (st-oto2-end): keep the two in
+     step with ty.js. */
   minutes: 8
 };
 
-const OTO_CLOCK_KEY = 'st-oto-end';
+const OTO_CLOCK_KEY = OTO_BODY.otoKey || 'st-oto-end';
 
 /* The UTMs that arrived with the visitor continue on to checkout, so the
    upsell sale is attributed to the same source as the original. */

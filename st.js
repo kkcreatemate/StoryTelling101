@@ -219,3 +219,43 @@ document.querySelectorAll('[data-vimeo]').forEach((poster) => {
     }
   }, { threshold: 0.6 }).observe(chat);
 })();
+
+/* ---------- Hero video ----------
+   It plays muted on loop, as browsers require for autoplay. The button
+   turns sound on (and restarts it from the top so the line isn't missed),
+   or off again. Starting a testimonial video or voice note mutes it. */
+(function () {
+  const video = document.querySelector('[data-hero-video]');
+  const btn = document.querySelector('[data-hero-sound]');
+  if (!video || !btn) return;
+  const label = btn.querySelector('[data-sound-label]');
+  function set(on) {
+    video.muted = !on;
+    btn.setAttribute('aria-label', on ? 'Turn sound off' : 'Turn sound on');
+    label.textContent = on ? 'Sound on' : 'Tap for sound';
+  }
+  btn.addEventListener('click', () => {
+    const on = video.muted;
+    if (on) video.currentTime = 0;
+    set(on);
+    video.play().catch(() => {});
+  });
+  document.addEventListener('st:video', () => set(false));
+  document.querySelectorAll('[data-note] audio').forEach((a) => a.addEventListener('play', () => set(false)));
+})();
+
+/* ---------- Videos further down load when they come near ---------- */
+(function () {
+  const vids = document.querySelectorAll('[data-lazy-video]');
+  if (!vids.length) return;
+  const load = (v) => {
+    v.querySelectorAll('source[data-src]').forEach((s) => { s.src = s.dataset.src; s.removeAttribute('data-src'); });
+    v.load();
+    v.play().catch(() => {});
+  };
+  if (!('IntersectionObserver' in window)) { vids.forEach(load); return; }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { load(e.target); io.unobserve(e.target); } });
+  }, { rootMargin: '200px 0px' });
+  vids.forEach((v) => io.observe(v));
+})();

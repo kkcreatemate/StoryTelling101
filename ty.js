@@ -49,7 +49,7 @@ const TY = {
   otoMinutes: 8
 };
 
-const OTO_CLOCK_KEY = 'st-oto-end';
+const OTO_CLOCK_KEY = 'st-oto2-end';
 
 /* ---------- Links ---------- */
 
