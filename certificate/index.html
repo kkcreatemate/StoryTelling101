@@ -11,8 +11,8 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../assets/fonts/kalam-700.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../assets/fonts/caveat-600.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../assets/fonts/nunito-400.woff2" />
-<link rel="stylesheet" href="../st.css?v=4" />
-<link rel="stylesheet" href="../cert.css?v=4" />
+<link rel="stylesheet" href="../st.css?v=5" />
+<link rel="stylesheet" href="../cert.css?v=5" />
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
@@ -42,6 +42,7 @@
     <div class="ct-steps" aria-label="Steps">
       <span data-step="1" class="is-now"><i>1</i> Your feedback</span>
       <span data-step="2"><i>2</i> Your certificate</span>
+      <span data-step="3"><i>3</i> Share &amp; tag us</span>
     </div>
 
     <!-- ============ Step 1: feedback ============ -->
@@ -207,8 +208,30 @@
         </div>
         <p class="ct-hint">Downloads as a 2560 &times; 1200 PNG, ready for LinkedIn, Instagram and WhatsApp.</p>
       </div>
-
     </div>
+
+    <!-- ============ Step 3: share ============ -->
+    <section class="ct-card ct-share" data-share hidden aria-labelledby="share-title">
+      <span class="st-note">Ab duniya ko dikhao</span>
+      <h2 id="share-title">Share your pass and tag us</h2>
+      <p>Post your certificate on Instagram, LinkedIn or Facebook, tag <b>@kk.create</b> and use our hashtag. Our favourite posts get reshared from the KK Create page or featured on our story.</p>
+      <div class="ct-tags">
+        <span class="ct-tag">#KKStorytelling101</span>
+        <span class="ct-tag">@kk.create</span>
+      </div>
+      <div class="ct-caption">
+        <p data-caption>I just completed Storytelling 101 with @kk.create! Sirf content mat banao, kahani sunao. #KKStorytelling101 #KKCreate #Storytelling</p>
+        <button class="st-btn st-btn-ghost" type="button" data-copy-caption>Copy caption</button>
+      </div>
+      <div class="ct-share-row">
+        <button class="st-btn" type="button" data-share-png>Share my certificate</button>
+        <a class="ct-social" href="https://www.instagram.com/kk.create/" target="_blank" rel="noopener">Instagram</a>
+        <a class="ct-social" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fstorytelling101.vercel.app%2F" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="ct-social" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fstorytelling101.vercel.app%2F" target="_blank" rel="noopener">Facebook</a>
+      </div>
+      <p class="ct-status" data-share-status role="status"></p>
+    </section>
+
   </div>
 </main>
 
@@ -222,7 +245,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
-<script src="../cert.js?v=4"></script>
+<script src="../cert.js?v=5"></script>
 
 </body>
 </html>

@@ -6,7 +6,8 @@
       devices that can't share files). Sending it unlocks step 2, and the
       unlock is remembered on this device.
    2. The Storyteller's Pass: filled from the form and downloaded as a PNG.
-      The photo is read locally and the image is drawn on the device. */
+      The photo is read locally and the image is drawn on the device.
+   3. Sharing: the pass and a ready caption, tagged @kk.create. */
 (function () {
   const SUPPORT_WA = '918700105418';
   const UNLOCK_KEY = 'st-cert-unlocked';
@@ -198,17 +199,25 @@
 
   const W = 1280, H = 600;
 
+  const shareCard = document.querySelector('[data-share]');
+
+  // The tracker: step n is current, everything before it is done.
+  function setStep(n) {
+    document.querySelectorAll('[data-step]').forEach((s) => {
+      const k = Number(s.dataset.step);
+      s.classList.toggle('is-now', k === n);
+      s.classList.toggle('is-done', k < n);
+    });
+  }
+
   function setLocked(locked) {
     unlocked = !locked;
     stage.classList.toggle('is-locked', locked);
     lock.hidden = !locked;
     form.hidden = locked;
+    shareCard.hidden = locked;
     document.querySelector('[data-unlocked]').hidden = locked;
-    document.querySelectorAll('[data-step]').forEach((s) => {
-      const two = s.dataset.step === '2';
-      s.classList.toggle('is-now', two ? !locked : locked);
-      s.classList.toggle('is-done', !two && !locked);
-    });
+    setStep(locked ? 1 : 2);
   }
 
   function unlock(name) {
@@ -294,28 +303,88 @@
 
     button.disabled = true;
     status.textContent = 'Drawing your certificate…';
+    try {
+      const a = document.createElement('a');
+      a.href = await drawPng();
+      a.download = fileName();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      status.textContent = 'Downloaded. Now share it and tag us!';
+      setStep(3);
+    } catch (err) {
+      status.textContent = 'Something went wrong while drawing it. Please try again.';
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  const fileName = () => 'KK-Create-Storytelling-101-Certificate-' + tidy(nameIn.value).replace(/[^A-Za-z0-9]+/g, '-') + '.png';
+
+  // The pass at full size, as a PNG data URL.
+  async function drawPng() {
     const prev = scaleBox.style.transform;
     scaleBox.style.transform = 'none';
     try {
       if (document.fonts && document.fonts.ready) await document.fonts.ready;
       // An <img> with no src (the photo slot before a photo is chosen) makes
       // the renderer fail outright, so it is left out of the drawing.
-      const url = await htmlToImage.toPng(cert, {
+      return await htmlToImage.toPng(cert, {
         width: W, height: H, pixelRatio: 2, cacheBust: true,
         filter: (node) => !(node.tagName === 'IMG' && !node.getAttribute('src'))
       });
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'KK-Create-Storytelling-101-Certificate-' + tidy(nameIn.value).replace(/[^A-Za-z0-9]+/g, '-') + '.png';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      status.textContent = 'Downloaded. Share it on your profiles!';
-    } catch (err) {
-      status.textContent = 'Something went wrong while drawing it. Please try again.';
     } finally {
       scaleBox.style.transform = prev;
-      button.disabled = false;
+    }
+  }
+
+  /* ================= Step 3: share ================= */
+  const shareStatus = shareCard.querySelector('[data-share-status]');
+  const caption = shareCard.querySelector('[data-caption]').textContent;
+  const copyBtn = shareCard.querySelector('[data-copy-caption]');
+  const shareBtn = shareCard.querySelector('[data-share-png]');
+
+  async function copyCaption() {
+    try { await navigator.clipboard.writeText(caption); return true; } catch (e) { return false; }
+  }
+
+  copyBtn.addEventListener('click', async () => {
+    const label = copyBtn.textContent;
+    copyBtn.textContent = (await copyCaption()) ? 'Copied!' : 'Copy failed';
+    setTimeout(() => { copyBtn.textContent = label; }, 2000);
+  });
+
+  /* Phones get the share sheet with the image and caption attached. Where
+     files can't be shared, the image downloads and the caption is copied,
+     ready to paste into a post. */
+  shareBtn.addEventListener('click', async () => {
+    if (!tidy(nameIn.value)) { nameIn.focus(); shareStatus.textContent = 'Add your name to the certificate first.'; return; }
+    if (!window.htmlToImage) { shareStatus.textContent = 'Could not load the image tool. Check your connection and try again.'; return; }
+    shareBtn.disabled = true;
+    shareStatus.textContent = 'Drawing your certificate…';
+    try {
+      const url = await drawPng();
+      const file = new File([await (await fetch(url)).blob()], fileName(), { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await copyCaption();
+        await navigator.share({ files: [file], text: caption });
+        shareStatus.textContent = 'Shared! Don’t forget to tag @kk.create.';
+      } else {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        shareStatus.textContent = (await copyCaption())
+          ? 'Saved your certificate and copied the caption. Post it and tag @kk.create.'
+          : 'Saved your certificate. Post it with the caption above and tag @kk.create.';
+      }
+      setStep(3);
+    } catch (err) {
+      shareStatus.textContent = err && err.name === 'AbortError' ? '' : 'That didn’t work. Try Download certificate instead.';
+    } finally {
+      shareBtn.disabled = false;
     }
   });
 

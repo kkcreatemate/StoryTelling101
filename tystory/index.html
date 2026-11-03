@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../assets/fonts/kalam-700.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../assets/fonts/nunito-400.woff2" />
-<link rel="stylesheet" href="../st.css?v=4" />
+<link rel="stylesheet" href="../st.css?v=5" />
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
@@ -44,7 +44,7 @@
         <dl>
           <div><dt>DATE</dt><dd>Sun, 22 Nov 2026</dd></div>
           <div><dt>TIME</dt><dd>12 to 4 PM IST</dd></div>
-          <div><dt>WHERE</dt><dd>Live on Zoom</dd></div>
+          <div><dt>WHERE</dt><dd>Live, online</dd></div>
           <div><dt>HOST</dt><dd>Varun Pandey</dd></div>
         </dl>
       </div>
@@ -68,15 +68,26 @@
       <p class="st-rules-note">Please note: access is available only to successfully registered participants. Following these instructions helps you avoid last-minute joining issues.</p>
     </section>
 
-    <section class="st-help" style="margin-top:22px">
-      <p><b>Added the Content Creator Bundle?</b> Your 4 workshop recordings and their 12 bonuses are in your portal at learn.kkcreate.in, on the same login.</p>
+    <section aria-labelledby="order-title" style="margin-top:clamp(36px,6vw,56px)">
+      <span class="st-note">Aapka order</span>
+      <h2 class="st-h2" id="order-title">What&rsquo;s <mark>yours</mark></h2>
+      <ul class="st-order">
+        <li><i>&#10003;</i><div><b>Storytelling 101, live seat</b><span>Sun, 22 Nov, 12 to 4 PM IST</span></div></li>
+        <li><i>&#10003;</i><div><b>The Viral Storytelling Breakdown</b><span>Free bonus: 5 winning reels, 5 storytelling frameworks</span></div></li>
+        <li data-if-got="bundle" hidden><i>&#10003;</i><div><b>Content Creator Bundle</b><span>4 workshop recordings and their 12 bonuses</span></div></li>
+        <li data-if-got="kit" hidden><i>&#10003;</i><div><b>The Complete Reel Creation Playbook</b><span>Visual storytelling, editing, hooks and retention techniques</span></div></li>
+        <li data-if-got="challenge" hidden><i>&#10003;</i><div><b>The 30-Day Storytelling Challenge</b><span>30 days of prompts with hooks for different niches</span></div></li>
+        <li data-if-got="ideas" hidden><i>&#10003;</i><div><b>The Content Idea Engine</b><span>20+ ways to find your next content idea, with AI prompts</span></div></li>
+      </ul>
+      <p class="st-lead">Everything is in your portal at learn.kkcreate.in, on the same login you paid with. The workshop recording and the free bonus are added within 24 hours of the live session.</p>
+      <a class="st-btn" style="margin-top:18px" href="https://learn.kkcreate.in" data-lms>Open my portal</a>
     </section>
 
-    <section class="st-oto-strip" aria-labelledby="oto-title" data-oto-strip>
+    <section class="st-oto-strip" aria-labelledby="oto-title" data-oto-strip data-if-not="kit">
       <div>
         <small>ONE-TIME OFFER &middot; STILL OPEN</small>
         <h2 id="oto-title">The Complete Reel Creation Playbook</h2>
-        <p>From story to scroll-stopping reel: visual storytelling, editing, hooks and retention techniques from our team.</p>
+        <p>From story to scroll-stopping reel: visual storytelling, editing, hooks and retention techniques from our team. <b>&#8377;499</b> <s>&#8377;2,000</s></p>
       </div>
       <div class="st-oto-buy">
         <div class="st-clock" data-timer>
@@ -86,6 +97,42 @@
           <span><b data-clock-s>00</b> SECS</span>
         </div>
         <a class="st-btn" href="/stoto" data-oto>Take me to the offer</a>
+      </div>
+    </section>
+
+    <section aria-labelledby="box-title" data-if-got="kit" hidden style="margin-top:clamp(36px,6vw,56px)">
+      <span class="st-note">Also unlocked</span>
+      <h2 class="st-h2" id="box-title">The Complete <mark>Reel Creation Playbook</mark></h2>
+      <p class="st-lead">From story to scroll-stopping reel. Find it in your portal at learn.kkcreate.in, on the same login.</p>
+      <ul class="st-unlocked">
+        <li><i>1</i><span>Visual storytelling techniques</span></li>
+        <li><i>2</i><span>Editing methods</span></li>
+        <li><i>3</i><span>Hooks</span></li>
+        <li><i>4</i><span>Audience-retention techniques</span></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="addons-title" style="margin-top:clamp(36px,6vw,56px)">
+      <span class="st-note">Thoda aur?</span>
+      <h2 class="st-h2" id="addons-title">Add to your <mark>storytelling toolkit</mark></h2>
+      <p class="st-lead">Two small add-ons that keep you posting after Sunday. After paying you come straight back here.</p>
+      <div class="st-addons">
+        <article class="st-addon">
+          <small>Add-on &middot; 30 days</small>
+          <h3>The 30-Day Storytelling Challenge</h3>
+          <p>30 days of storytelling prompts, tried by our team, with hooks for different niches. 30 days, 30 prompts, no more wondering what to post.</p>
+          <p class="st-addon-price"><b>&#8377;299</b></p>
+          <a class="st-btn" href="https://learn.kkcreate.in/web/checkout/6ae9e859dca020e8f4843a0e" data-addon data-if-not="challenge">Add it for &#8377;299</a>
+          <p class="st-addon-done" data-if-got="challenge" hidden>&#10003; Unlocked. It&rsquo;s in your portal.</p>
+        </article>
+        <article class="st-addon">
+          <small>Add-on &middot; Ideas</small>
+          <h3>The Content Idea Engine</h3>
+          <p>20+ ways to find your next content idea, from your personal life to the news to AI-assisted research, with ready-to-use AI prompts for your niche.</p>
+          <p class="st-addon-price"><b>&#8377;199</b> <s>&#8377;499</s></p>
+          <a class="st-btn" href="https://learn.kkcreate.in/web/checkout/6ae9e7b4897a4e7964c3b251" data-addon data-if-not="ideas">Add it for &#8377;199</a>
+          <p class="st-addon-done" data-if-got="ideas" hidden>&#10003; Unlocked. It&rsquo;s in your portal.</p>
+        </article>
       </div>
     </section>
 
@@ -124,7 +171,8 @@
   </div>
 </footer>
 
-<script src="../ty.js?v=4"></script>
+<script src="../order.js?v=1"></script>
+<script src="../ty.js?v=6"></script>
 
 </body>
 </html>

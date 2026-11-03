@@ -53,6 +53,7 @@ a { color: var(--pen); }
 h1, h2, h3, p, ul, ol, figure, blockquote, dl, dd { margin: 0; padding: 0; }
 ul, ol { list-style: none; }
 button { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
 :focus-visible { outline: 3px solid var(--pen); outline-offset: 3px; border-radius: 4px; }
 
 .st-wrap { width: min(1120px, 100%); margin-inline: auto; padding-inline: 20px; }
@@ -420,13 +421,14 @@ button { font: inherit; color: inherit; }
 .st-now-list b { display: block; font-weight: 800; font-size: 18px; line-height: 1.3; }
 .st-now-list span { display: block; margin-top: 4px; color: var(--ink-2); }
 
-/* "Live on Zoom" in place of the price on the landing page. */
-.st-zoom { display: inline-flex; align-items: center; gap: 8px; width: fit-content; padding: 8px 16px; border-radius: 999px; background: var(--sky); font-weight: 800; font-size: 15px; color: var(--pen-2); }
-.st-zoom svg { width: 20px; height: 20px; }
-.st-ticket-zoom { display: flex; align-items: center; gap: 16px; }
-.st-ticket-zoom svg { flex: none; width: 58px; height: 58px; padding: 13px; border-radius: 16px; background: var(--sky); color: var(--pen); }
-.st-ticket-zoom span { font-weight: 700; color: var(--ink-2); }
-.st-ticket-zoom b { display: block; font-family: var(--hand); font-weight: 700; font-size: clamp(32px, 5vw, 42px); line-height: 1.1; color: var(--ink); }
+/* "Live" in place of the price on the landing page, with an on-air dot. */
+.st-live { display: inline-flex; align-items: center; gap: 10px; width: fit-content; padding: 8px 18px; border-radius: 999px; background: var(--peach); font-weight: 800; font-size: 16px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink); }
+.st-live i, .st-ticket-live i { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--red); animation: st-ping-r 1.8s ease-out infinite; }
+.st-ticket-live { display: flex; align-items: center; gap: 16px; }
+.st-ticket-live i { width: 18px; height: 18px; }
+.st-ticket-live span { font-weight: 700; color: var(--ink-2); }
+.st-ticket-live b { display: block; font-family: var(--hand); font-weight: 700; font-size: clamp(32px, 5vw, 42px); line-height: 1.1; color: var(--ink); }
+@keyframes st-ping-r { 0% { box-shadow: 0 0 0 0 rgba(196, 66, 58, 0.55); } 100% { box-shadow: 0 0 0 10px rgba(196, 66, 58, 0); } }
 
 .bar { position: fixed; z-index: 60; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: #ffffff; border-top: 2px solid var(--ink); transition: transform 0.3s ease; }
 .bar.is-tucked { transform: translateY(115%); }
@@ -472,6 +474,25 @@ button { font: inherit; color: inherit; }
 .st-unlocked li { display: flex; gap: 12px; padding: 12px 16px; background: #ffffff; border: 1px solid var(--rule); border-radius: 10px; line-height: 1.4; font-weight: 700; }
 .st-unlocked i { flex: none; font-style: normal; font-family: var(--hand); font-size: 20px; color: var(--pen); }
 
+/* What the buyer has, and the add-ons they can still pick up. */
+.st-order { display: grid; gap: 10px; margin-top: 22px; }
+.st-order li { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; border: 1px solid var(--rule); border-radius: 12px; background: #ffffff; }
+.st-order i { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #1f9d55; font-style: normal; font-weight: 800; font-size: 14px; color: #ffffff; }
+.st-order b { display: block; font-weight: 800; font-size: 17px; line-height: 1.35; }
+.st-order span { display: block; color: var(--ink-2); font-size: 15px; }
+.st-addons { display: grid; gap: 14px; margin-top: 22px; }
+.st-addon { display: flex; flex-direction: column; gap: 8px; padding: clamp(20px, 3vw, 26px); border-radius: 18px; background: var(--lilac); }
+.st-addon:nth-child(2) { background: var(--mint); }
+.st-addon small { font-weight: 800; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--pen-2); }
+.st-addon h3 { font-family: var(--hand); font-weight: 700; font-size: clamp(24px, 3.6vw, 30px); line-height: 1.2; }
+.st-addon p { color: var(--ink-2); }
+.st-addon-price { display: flex; align-items: baseline; gap: 10px; margin-top: auto; }
+.st-addon-price b { font-family: var(--hand); font-size: 34px; line-height: 1; color: var(--ink); }
+.st-addon-price s { color: var(--ink-3); }
+.st-addon .st-btn { width: 100%; }
+.st-addon-done { padding: 12px 16px; border-radius: 12px; background: #ffffff; font-weight: 800; color: #157a40 !important; }
+.st-got { display: inline-block; margin-bottom: 10px; padding: 6px 14px; border-radius: 999px; background: var(--mint); font-weight: 800; font-size: 14px; color: #157a40; }
+
 /* Access instructions on the thank-you pages. */
 .st-rules { margin-top: clamp(28px, 5vw, 44px); padding: clamp(20px, 4vw, 30px); border: 2px solid var(--red); border-radius: 18px; background: #ffffff; }
 .st-rules-tag { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--red); font-weight: 800; font-size: 13px; letter-spacing: 0.04em; color: #ffffff; }
@@ -509,7 +530,7 @@ button { font: inherit; color: inherit; }
   .st-covers { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .st-oto-cta .st-btn { width: auto; }
   .st-boxes { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .st-gains, .st-vs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .st-gains, .st-vs, .st-addons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .st-wk { grid-template-columns: 240px minmax(0, 1fr); align-items: start; }
 }
 @media (min-width: 960px) {
@@ -544,6 +565,6 @@ button { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .st-road-track { animation: none; }
-  .st-voice-kick i, .st-note-bubble.needs-tap .st-note-play { animation: none; }
+  .st-voice-kick i, .st-note-bubble.needs-tap .st-note-play, .st-live i, .st-ticket-live i { animation: none; }
   .st-sticky, .bar { transition: none; }
 }

@@ -61,6 +61,8 @@ function withPageParams(url) {
   if (![...page.keys()].length) return url;
   const target = new URL(url, window.location.href);
   page.forEach((value, key) => {
+    // got= is order.js's bookkeeping, not a campaign param.
+    if (key === 'got') return;
     if (!target.searchParams.has(key)) target.searchParams.set(key, value);
   });
   return target.toString();

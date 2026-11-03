@@ -14,11 +14,11 @@
                          thank-you page after the last one.
      data-oto-key        the localStorage key for this offer's countdown.
 
-   The checkout links live here, in one place:
-     TODO: paste both TagMango checkout links. */
+   The checkout links live here, in one place. Each checkout's success
+   redirect in TagMango is listed in order.js. */
 const OTO_LINKS = {
-  bundle: '',
-  playbook: ''
+  bundle: 'https://learn.kkcreate.in/web/checkout/6ae9db545551e583dde0f3e2',
+  playbook: 'https://learn.kkcreate.in/web/checkout/6ae9dded7e12bd777e1d5d86'
 };
 
 const OTO_BODY = document.body.dataset;
@@ -44,6 +44,8 @@ function withPageParams(url) {
   if (![...page.keys()].length) return url;
   const target = new URL(url, window.location.href);
   page.forEach((value, key) => {
+    // got= is order.js's bookkeeping, not a campaign param.
+    if (key === 'got') return;
     if (!target.searchParams.has(key)) target.searchParams.set(key, value);
   });
   return target.toString();
@@ -54,9 +56,8 @@ function withPageParams(url) {
 function applyConfig() {
   if (OTO.checkoutUrl) {
     document.querySelectorAll('[data-buy]').forEach(el => {
+      // Same tab: checkout redirects onward to the next step of the funnel.
       el.href = withPageParams(OTO.checkoutUrl);
-      el.target = '_blank';
-      el.rel = 'noopener';
     });
   }
   if (OTO.declineUrl) {
