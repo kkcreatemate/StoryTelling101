@@ -12,4 +12,4 @@ Allow: /*.css$
 Allow: /*.js$
 Disallow: /
 
-Sitemap: https://storytelling.kkcreate.in/sitemap.xml
+Sitemap: https://storytelling101.vercel.app/sitemap.xml

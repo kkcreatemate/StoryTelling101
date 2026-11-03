@@ -364,6 +364,70 @@ button { font: inherit; color: inherit; }
 .st-save-total { margin-top: 6px; padding-top: 8px; border-top: 1px dashed var(--rule); font-size: 18px; }
 .st-save-total b { color: #157a40; font-size: 28px; }
 
+/* The bundle's four boxes: the same size, each on its own pastel card. */
+.st-boxes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(10px, 2vw, 18px); }
+.st-box { margin: 0; padding: clamp(12px, 2vw, 18px) clamp(10px, 1.6vw, 16px) 14px; border-radius: 18px; background: var(--sky); text-align: center; }
+.st-box:nth-child(2) { background: var(--peach); }
+.st-box:nth-child(3) { background: var(--mint); }
+.st-box:nth-child(4) { background: var(--lilac); }
+.st-box img { width: 100%; aspect-ratio: 397 / 568; object-fit: contain; filter: drop-shadow(0 10px 12px rgba(30, 42, 68, 0.18)); }
+.st-box figcaption { margin-top: 10px; font-weight: 800; font-size: 14px; line-height: 1.3; }
+.st-wk { display: grid; gap: 20px; margin-top: 24px; padding: clamp(18px, 3vw, 28px); background: #ffffff; border: 1px solid var(--rule); border-radius: 20px; }
+.st-wk-media { display: grid; place-items: center; padding: 18px; border-radius: 16px; background: var(--sky); }
+.st-wk:nth-of-type(2) .st-wk-media { background: var(--peach); }
+.st-wk:nth-of-type(3) .st-wk-media { background: var(--mint); }
+.st-wk:nth-of-type(4) .st-wk-media { background: var(--lilac); }
+.st-wk-media img { width: min(220px, 62%); filter: drop-shadow(0 10px 12px rgba(30, 42, 68, 0.18)); }
+.st-wk-no { font-family: var(--note); font-weight: 700; font-size: 24px; line-height: 1.1; color: var(--red); }
+.st-wk h3 { margin-top: 4px; font-family: var(--hand); font-weight: 700; font-size: clamp(26px, 4vw, 34px); line-height: 1.2; }
+.st-wk h3 + p { margin-top: 6px; color: var(--ink-2); }
+.st-gifts { display: grid; gap: 8px; margin-top: 16px; }
+.st-gifts li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px dashed var(--rule); border-radius: 12px; background: var(--paper-2); }
+.st-gifts small { display: block; font-weight: 800; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--pen); }
+.st-gifts b { display: block; font-weight: 800; line-height: 1.3; }
+.st-gifts em { flex: none; display: grid; justify-items: end; gap: 3px; font-style: normal; font-weight: 800; font-size: 14px; line-height: 1.2; }
+.st-gifts em s { color: var(--ink-3); }
+.st-gifts em span { padding: 2px 10px; border-radius: 999px; background: #1f9d55; color: #ffffff; font-size: 13px; letter-spacing: 0.04em; }
+.st-narrow-box { max-width: 560px; margin-inline: auto; margin-top: 34px; }
+.st-save-row b s { color: var(--ink-3); }
+
+/* The Playbook page: the gap, the gains, with/without, why now. */
+.st-pains { display: grid; gap: 10px; margin-block: 22px 6px; }
+.st-pains li { position: relative; padding: 14px 18px 14px 52px; background: #ffffff; border: 1px solid var(--rule); border-radius: 12px; font-family: var(--hand); font-size: 19px; line-height: 1.45; }
+.st-pains li::before { content: "?"; position: absolute; left: 16px; top: 13px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--butter); font-family: var(--body); font-weight: 800; font-size: 15px; color: var(--ink); }
+.st-gains { display: grid; gap: 14px; margin-block: 28px 4px; }
+.st-gain { padding: clamp(18px, 3vw, 26px); border-radius: 18px; background: var(--sky); }
+.st-gain:nth-child(2) { background: var(--peach); }
+.st-gain:nth-child(3) { background: var(--mint); }
+.st-gain:nth-child(4) { background: var(--lilac); }
+.st-gain small { font-weight: 800; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--pen-2); }
+.st-gain h3 { margin-top: 6px; font-family: var(--hand); font-weight: 700; font-size: clamp(24px, 3.4vw, 30px); line-height: 1.2; }
+.st-gain p { margin-top: 8px; color: var(--ink-2); }
+.st-gain p b { color: var(--ink); }
+.st-vs { display: grid; gap: 14px; margin-top: 28px; }
+.st-vs > div { padding: clamp(18px, 3vw, 26px); border: 1px solid var(--rule); border-radius: 18px; background: #ffffff; }
+.st-vs > .is-with { border: 2px solid #1f9d55; background: var(--mint); }
+.st-vs h3 { font-family: var(--hand); font-weight: 700; font-size: clamp(24px, 3.4vw, 30px); line-height: 1.2; }
+.st-vs ul { display: grid; gap: 10px; margin-top: 12px; }
+.st-vs li { position: relative; padding-left: 28px; line-height: 1.45; color: var(--ink-2); }
+.st-vs li::before { content: "\2715"; position: absolute; left: 0; font-weight: 800; color: var(--red); }
+.st-vs .is-with li { color: var(--ink); font-weight: 700; }
+.st-vs .is-with li::before { content: "\2713"; color: #157a40; }
+.st-now { background: var(--butter); }
+.st-now-list { display: grid; gap: 12px; margin-top: 24px; counter-reset: now; }
+.st-now-list li { position: relative; padding: 18px 20px 18px 66px; border-radius: 14px; background: #ffffff; }
+.st-now-list li::before { counter-increment: now; content: counter(now); position: absolute; left: 18px; top: 17px; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--pen); font-family: var(--hand); font-weight: 700; color: #ffffff; }
+.st-now-list b { display: block; font-weight: 800; font-size: 18px; line-height: 1.3; }
+.st-now-list span { display: block; margin-top: 4px; color: var(--ink-2); }
+
+/* "Live on Zoom" in place of the price on the landing page. */
+.st-zoom { display: inline-flex; align-items: center; gap: 8px; width: fit-content; padding: 8px 16px; border-radius: 999px; background: var(--sky); font-weight: 800; font-size: 15px; color: var(--pen-2); }
+.st-zoom svg { width: 20px; height: 20px; }
+.st-ticket-zoom { display: flex; align-items: center; gap: 16px; }
+.st-ticket-zoom svg { flex: none; width: 58px; height: 58px; padding: 13px; border-radius: 16px; background: var(--sky); color: var(--pen); }
+.st-ticket-zoom span { font-weight: 700; color: var(--ink-2); }
+.st-ticket-zoom b { display: block; font-family: var(--hand); font-weight: 700; font-size: clamp(32px, 5vw, 42px); line-height: 1.1; color: var(--ink); }
+
 .bar { position: fixed; z-index: 60; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: #ffffff; border-top: 2px solid var(--ink); transition: transform 0.3s ease; }
 .bar.is-tucked { transform: translateY(115%); }
 .bar-copy { min-width: 0; font-weight: 800; font-size: 14px; line-height: 1.3; }
@@ -408,6 +472,19 @@ button { font: inherit; color: inherit; }
 .st-unlocked li { display: flex; gap: 12px; padding: 12px 16px; background: #ffffff; border: 1px solid var(--rule); border-radius: 10px; line-height: 1.4; font-weight: 700; }
 .st-unlocked i { flex: none; font-style: normal; font-family: var(--hand); font-size: 20px; color: var(--pen); }
 
+/* Access instructions on the thank-you pages. */
+.st-rules { margin-top: clamp(28px, 5vw, 44px); padding: clamp(20px, 4vw, 30px); border: 2px solid var(--red); border-radius: 18px; background: #ffffff; }
+.st-rules-tag { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--red); font-weight: 800; font-size: 13px; letter-spacing: 0.04em; color: #ffffff; }
+.st-rules h2 { margin-top: 10px; font-family: var(--hand); font-weight: 700; font-size: clamp(26px, 4.4vw, 34px); line-height: 1.2; }
+.st-rules > p { margin-top: 6px; color: var(--ink-2); }
+.st-rules ol { display: grid; gap: 14px; margin-top: 18px; counter-reset: rule; }
+.st-rules li { position: relative; padding-left: 48px; }
+.st-rules li::before { counter-increment: rule; content: counter(rule); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--butter); font-family: var(--hand); font-weight: 700; font-size: 18px; color: var(--ink); }
+.st-rules li b { display: block; font-weight: 800; font-size: 17px; line-height: 1.35; }
+.st-rules li span { display: block; margin-top: 2px; color: var(--ink-2); }
+.st-rules li a { font-weight: 800; }
+.st-rules-note { margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: var(--butter); font-weight: 700; color: var(--ink); }
+
 /* ---------- Legal ---------- */
 .st-doc { padding-block: clamp(36px, 6vw, 64px); }
 .st-doc h1 { font-family: var(--hand); font-weight: 700; font-size: clamp(38px, 7vw, 58px); line-height: 1.1; }
@@ -431,6 +508,9 @@ button { font: inherit; color: inherit; }
   .st-mods, .st-for-list, .st-stories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .st-covers { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .st-oto-cta .st-btn { width: auto; }
+  .st-boxes { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .st-gains, .st-vs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .st-wk { grid-template-columns: 240px minmax(0, 1fr); align-items: start; }
 }
 @media (min-width: 960px) {
   body { font-size: 18px; }
@@ -448,6 +528,8 @@ button { font: inherit; color: inherit; }
   .st-host-in { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 56px; align-items: center; }
   .st-offer-in { grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 56px; }
   .st-wait-in { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 56px; }
+  .st-boxes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .st-wk { grid-template-columns: 280px minmax(0, 1fr); gap: 32px; }
   .st-pass { grid-template-columns: minmax(0, 1fr) 300px; }
   .st-pass-stub { border-top: 0; border-left: 2px dashed var(--rule); align-content: center; }
   .st-oto-strip { grid-template-columns: minmax(0, 1fr) 300px; align-items: center; }

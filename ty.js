@@ -32,7 +32,7 @@ const TY = {
   // sharing this passes on a clean link.
   //
   // Empty hides the referral card.
-  referralUrl: 'https://storytelling.kkcreate.in/',
+  referralUrl: 'https://storytelling101.vercel.app/',
 
   /* How long the offer stays open per visitor, from the moment they first
      see it — which is normally /stoto, since that is the page checkout

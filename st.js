@@ -5,10 +5,12 @@
 
 /* ---------- Checkout links ----------
    utm_*, gclid, fbclid and so on carry through to TagMango, so a sale is
-   credited to whatever earned it. A param the link already has wins. */
+   credited to whatever earned it. A param the link already has wins. The offer pages load this file
+   for the rails and voice notes only; their [data-buy] links are oto.js's. */
 (function () {
   const page = new URLSearchParams(window.location.search);
   if (![...page.keys()].length) return;
+  if (document.body.dataset.otoOffer) return;
   document.querySelectorAll('[data-buy]').forEach((link) => {
     const target = new URL(link.href, window.location.href);
     page.forEach((value, key) => {
