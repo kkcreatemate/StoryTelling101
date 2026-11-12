@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JJ X-Ray Mirror</title>
+<title>J Ray</title>
 <style>
   :root { --bg:#090c13; --panel:#141926; --line:#262d42; --fg:#eef1f8; --dim:#8b95b2;
           --accent:#7fd1ff; --ok:#57d98a; --bad:#ff5d73; }
@@ -143,15 +143,45 @@
   .opts h4 { margin:0 0 4px; font-size:14px; } .opts .tag { font-size:11px; color:var(--jj); font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
   @media (max-width:900px) { .lab { grid-template-columns:1fr; padding:16px; } .opts { grid-template-columns:1fr; } .jjbar { padding:12px 16px; } }
   @media (max-width:480px) { .form, .form .cks { grid-template-columns:1fr; } .steps li { grid-template-columns:78px 1fr; } }
+
+  /* ---------- 3D corner view ---------- */
+  .v3d { height:min(60vh,440px); perspective:1100px; overflow:hidden; background:#000; border:1px solid var(--line); border-radius:12px; touch-action:none; cursor:grab; display:grid; place-items:center; }
+  .scene3 { position:relative; width:0; height:0; transform-style:preserve-3d; }
+  #pivot3 { position:absolute; transform-style:preserve-3d; }
+  .face { position:absolute; background-repeat:no-repeat; outline:1px solid rgba(127,209,255,.55); }
+  .face::after { content:attr(data-l); position:absolute; left:6px; top:6px; font-size:11px; font-weight:700; color:var(--accent); background:rgba(4,7,13,.7); padding:2px 6px; border-radius:6px; }
+  #faceS { transform-origin:0 50%; transform:rotateY(-90deg); }
+  .btn.on { background:var(--accent); border-color:var(--accent); color:#06121c; font-weight:700; }
+
+  /* ---------- Ray J health tracker ---------- */
+  .cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px 14px; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .card .k { font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); }
+  .card .v { font-size:24px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1.15; }
+  .card .v small { font-size:13px; font-weight:500; color:var(--dim); }
+  .card .s { font-size:13px; color:var(--dim); }
+  .targets { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+  .targets div { background:var(--ink); border:1px solid var(--line); border-radius:10px; padding:9px 10px; min-width:0; }
+  .targets b { display:block; font-size:20px; font-variant-numeric:tabular-nums; } .targets span { font-size:12px; color:var(--dim); }
+  .habits { display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; }
+  .water { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .water .glasses { display:flex; gap:4px; flex-wrap:wrap; }
+  .water .glasses i { width:14px; height:20px; border:1.5px solid var(--accent); border-radius:2px 2px 5px 5px; display:block; }
+  .water .glasses i.f { background:var(--accent); }
+  .spark { width:100%; height:64px; display:block; }
+  @media (max-width:900px) { .cards { grid-template-columns:1fr 1fr; } .targets { grid-template-columns:1fr 1fr; } }
+  @media (max-width:480px) { .habits { grid-template-columns:1fr; } }
+  label.ck input[type=checkbox] { flex:none; }
 </style>
 </head>
 <body>
 <header class="jjbar">
   <div class="jjmark" aria-hidden="true">JJ</div>
-  <div class="jjname"><b>JJ X-Ray Mirror</b><span>JJ Pattern · built by Jyotish Jha</span></div>
+  <div class="jjname"><b>J Ray</b><span>X-ray mirror · fracture lab · Ray J health tracker · by Jyotish Jha</span></div>
   <div class="tabs" role="tablist">
     <button id="tab_mirror" role="tab" aria-selected="true" type="button">Mirror</button>
     <button id="tab_lab" role="tab" aria-selected="false" type="button">Fracture Lab</button>
+    <button id="tab_health" role="tab" aria-selected="false" type="button">Ray J Health</button>
   </div>
 </header>
 <div class="wrap" id="mirrorView">
@@ -162,7 +192,7 @@
       <canvas id="gl"></canvas>
       <canvas id="hud"></canvas>
       <div id="intro">
-        <h2>JJ X-RAY MIRROR</h2>
+        <h2>J RAY MIRROR</h2>
         <p>See the skull, brain and muscles inside your own head, tracked live through your camera. Hold a hand up to see its bones.</p>
         <button class="big" id="start">Start camera</button>
       </div>
@@ -249,8 +279,8 @@
 
 <section class="lab" id="labView" hidden>
   <div class="wide">
-    <h2>JJ Fracture Lab</h2>
-    <p class="lead">Load your real X-ray, mark the bone landmarks, and the JJ Pattern checks your numbers against the alignment limits orthopaedic surgeons use. Nothing is guessed from the picture: every number comes from points you mark or values you type from your report.</p>
+    <h2>Fracture Lab</h2>
+    <p class="lead">Load your real X-ray, mark the bone landmarks, and J Ray checks your numbers against the alignment limits orthopaedic surgeons use. Nothing is guessed from the picture: every number comes from points you mark or values you type from your report.</p>
     <div class="note"><b>Read this once.</b> This is a preparation tool for talking to your orthopaedic surgeon. It cannot diagnose, and it cannot see soft tissue, nerves or bone quality. The surgeon who examines your hand decides the treatment. Your X-ray stays on this device and is never uploaded.</div>
   </div>
 
@@ -269,7 +299,10 @@
       <div class="thumbs" id="thumbs" style="margin-top:10px"></div>
       <div id="xcontrols" hidden>
         <div class="row"><label for="xview">This picture is</label>
-          <select id="xview"><option value="pa">Front view (PA)</option><option value="lat">Side view (lateral)</option><option value="other">Other view</option></select></div>
+          <select id="xview"><option value="pa">Front view (PA)</option><option value="lat">Side view (lateral)</option><option value="both_fs">Both: front on left, side on right</option><option value="both_sf">Both: side on left, front on right</option><option value="other">Other view</option></select></div>
+        <div class="row"><label for="xdate">Date on the film</label><input type="date" id="xdate" class="btn" style="color-scheme:dark"></div>
+        <div class="row"><label for="xstage">Taken</label>
+          <select id="xstage"><option value="injury">Before any setting (injury film)</option><option value="postcr">Right after a CR</option><option value="check">Follow-up check</option><option value="postop">After surgery</option><option value="other">Other</option></select></div>
         <div class="row"><label for="xzoom">Zoom</label><input id="xzoom" type="range" min="1" max="4" step="0.05" value="1"></div>
         <div class="row"><label for="xbright">Brightness</label><input id="xbright" type="range" min="0.4" max="2.5" step="0.01" value="1"></div>
         <div class="row"><label for="xcontrast">Contrast</label><input id="xcontrast" type="range" min="0.5" max="3" step="0.01" value="1"></div>
@@ -292,6 +325,19 @@
       <div class="row" id="scalerow" hidden><label for="xscalemm">Real length of the line you marked (mm)</label><input id="xscalemm" type="number" min="1" step="0.1" style="max-width:110px" class="btn"></div>
       <div class="mlist" id="mlist" style="margin-top:10px"></div>
       <p class="small" style="margin-top:10px">Angles need no scale. Millimetre values need "Set scale" on something of known length in the picture (a ruler or marker). If there is none, type the mm values from your radiology report instead. A tilted or rotated photo of the film changes the numbers, so shoot it straight on.</p>
+    </div>
+
+    <div class="panel" id="v3dpanel" hidden>
+      <h3>3D corner view</h3>
+      <div class="v3d" id="v3d"><div class="scene3" id="scene3"><div id="pivot3"><div class="face" id="faceF" data-l="Front view"></div><div class="face" id="faceS" data-l="Side view"></div></div></div></div>
+      <div class="row"><label for="x3zoom">Zoom</label><input id="x3zoom" type="range" min="0.5" max="3" step="0.01" value="1"></div>
+      <div class="row"><span class="small" id="x3note"></span><span style="display:flex;gap:7px;flex:none"><button class="btn" id="x3spin" type="button">Spin</button><button class="btn" id="x3reset" type="button">Reset</button></span></div>
+      <p class="small" style="margin-top:8px">Drag to turn it. The front and side films stand at a right angle, the way a surgeon reads them together, so you can look around the corner of the wrist. This is two flat pictures, not a true 3D model of the bone; only the CT scan gives that.</p>
+    </div>
+
+    <div class="panel" id="seriespanel" hidden>
+      <h3>Film series: what changed between X-rays</h3>
+      <div id="series"></div>
     </div>
 
     <div class="panel">
@@ -335,7 +381,58 @@
 
   <div class="rep" id="report" aria-live="polite"></div>
 
-  <p class="small wide">JJ Pattern, built by Jyotish Jha. Alignment limits follow the commonly used distal radius criteria (dorsal tilt over 10°, shortening over 3 mm or a joint step over 2 mm point toward fixation), and instability signs follow Lafontaine's criteria. These are general population rules; your surgeon may reasonably decide differently for your hand.</p>
+  <p class="small wide">J Ray, built by Jyotish Jha. Alignment limits follow the commonly used distal radius criteria (dorsal tilt over 10°, shortening over 3 mm or a joint step over 2 mm point toward fixation), and instability signs follow Lafontaine's criteria. These are general population rules; your surgeon may reasonably decide differently for your hand.</p>
+</section>
+
+<section class="lab" id="healthView" hidden>
+  <div class="wide">
+    <h2>Ray J · health tracker and coach</h2>
+    <p class="lead">Log weight, blood pressure, pulse and sugar. Ray J reads them against standard adult ranges, checks the air you breathe, and sets your food, protein and water for the day. Everything is saved on this device only.</p>
+  </div>
+
+  <div class="wide cards" id="h_cards"></div>
+
+  <div>
+    <div class="panel">
+      <h3>About you</h3>
+      <div class="form">
+        <div class="f"><label class="t" for="h_sex">Sex</label><select id="h_sex"><option value="m">Male</option><option value="f">Female</option></select></div>
+        <div class="f"><label class="t" for="h_age">Age</label><input type="number" id="h_age" min="10" max="100" placeholder="years"></div>
+        <div class="f"><label class="t" for="h_height">Height (cm)</label><input type="number" id="h_height" min="100" max="230" step="0.5" placeholder="cm"></div>
+        <div class="f"><label class="t" for="h_act">Daily activity</label><select id="h_act"><option value="1.4">Mostly sitting or resting</option><option value="1.55">Light: walking, standing work</option><option value="1.7">Active: exercise most days</option><option value="1.9">Heavy physical work or training</option></select></div>
+        <div class="f"><label class="t" for="h_chest">Chest, relaxed (inches)</label><input type="number" id="h_chest" min="20" max="60" step="0.5" placeholder="in"></div>
+        <div class="f"><label class="t" for="h_chestx">Chest, full breath in (inches)</label><input type="number" id="h_chestx" min="20" max="65" step="0.5" placeholder="in"></div>
+        <div class="f"><label class="t" for="h_diet">Food</label><select id="h_diet"><option value="veg">Vegetarian</option><option value="egg">Vegetarian + eggs</option><option value="nonveg">Non-vegetarian</option></select></div>
+        <div class="f"><label class="t" for="h_city">City (for air quality)</label><select id="h_city">
+          <option value="28.61,77.21">Delhi</option><option value="19.08,72.88">Mumbai</option><option value="22.57,88.36">Kolkata</option><option value="12.97,77.59">Bengaluru</option>
+          <option value="13.08,80.27">Chennai</option><option value="17.39,78.49">Hyderabad</option><option value="18.52,73.86">Pune</option><option value="26.85,80.95">Lucknow</option>
+          <option value="25.59,85.14">Patna</option><option value="here">Where I am now</option></select></div>
+        <div class="f full"><label class="t" for="h_aqi">AQI today, if you want to type it yourself (India scale, 0 to 500)</label><input type="number" id="h_aqi" min="0" max="999" placeholder="leave empty to fetch live"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Add a reading</h3>
+      <div class="form">
+        <div class="f"><label class="t" for="e_d">Date</label><input type="date" id="e_d"></div>
+        <div class="f"><label class="t" for="e_w">Weight (kg)</label><input type="number" id="e_w" min="20" max="250" step="0.1"></div>
+        <div class="f"><label class="t" for="e_sys">Blood pressure (upper / lower)</label><div class="pair"><input type="number" id="e_sys" min="60" max="260" placeholder="SYS"><input type="number" id="e_dia" min="30" max="160" placeholder="DIA"></div></div>
+        <div class="f"><label class="t" for="e_pul">Pulse (per minute)</label><input type="number" id="e_pul" min="30" max="220"></div>
+        <div class="f"><label class="t" for="e_glu">Blood sugar (mg/dL)</label><input type="number" id="e_glu" min="20" max="600"></div>
+        <div class="f"><label class="t" for="e_glut">Sugar taken</label><select id="e_glut"><option value="random">Any time (random)</option><option value="fasting">Fasting, 8 hours no food</option><option value="pp">2 hours after a meal</option></select></div>
+      </div>
+      <div class="row"><span class="small" id="e_msg"></span><button class="big" id="e_add" type="button" style="padding:9px 16px;font-size:15px">Save reading</button></div>
+    </div>
+
+    <div class="panel">
+      <h3>Your log</h3>
+      <div id="h_log"></div>
+    </div>
+  </div>
+
+  <div class="rep" id="h_coach" aria-live="polite"></div>
+
+  <p class="small wide">Ray J, built by Jyotish Jha. Ranges are general adult reference values (WHO body-mass bands, standard blood pressure and sugar cut-offs, India's CPCB air quality bands). One reading is a snapshot: trends across several days matter more. This does not replace a doctor or a registered dietitian.</p>
 </section>
 
 <script id="meshmeta" type="application/json">{"labels":[{"t":"Frontal bone","layer":"skull","jaw":0,"pts":[[0.13,8.05,4.35]]},{"t":"Parietal bone","layer":"skull","jaw":0,"pts":[[5.63,10.85,-10.69],[-5.47,11.12,-10.66]]},{"t":"Temporal bone","layer":"skull","jaw":0,"pts":[[6.38,-0.13,-6.21],[-6.6,0.03,-6.1]]},{"t":"Occipital bone","layer":"skull","jaw":0,"pts":[[0.14,3.45,-15.35]]},{"t":"Nasal bone","layer":"skull","jaw":0,"pts":[[0.04,2.18,5.59]]},{"t":"Zygomatic bone (cheekbone)","layer":"skull","jaw":0,"pts":[[4.93,0.15,2.29],[-5.08,0.39,2.32]]},{"t":"Maxilla (upper jaw)","layer":"skull","jaw":0,"pts":[[4.22,-0.84,2.54],[-4.33,-0.71,2.66]]},{"t":"Teeth","layer":"skull","jaw":0,"pts":[[0.4,-2.32,4.68]]},{"t":"Mandible (lower jaw)","layer":"skull","jaw":1,"pts":[[-0.12,-7.4,4.22]]},{"t":"Eyeball","layer":"eyes","jaw":0,"pts":[[2.93,2.86,3.75],[-2.87,2.84,3.83]]},{"t":"Frontal lobe","layer":"brain","jaw":0,"pts":[[2.42,12.69,-2.63],[-2.33,12.71,-2.53]]},{"t":"Parietal lobe","layer":"brain","jaw":0,"pts":[[3.41,10.88,-11.74],[-3.34,11.02,-11.69]]},{"t":"Temporal lobe","layer":"brain","jaw":0,"pts":[[7.19,5.91,-7.62],[-7.22,6.0,-7.49]]},{"t":"Occipital lobe","layer":"brain","jaw":0,"pts":[[2.05,4.5,-14.64],[-2.11,4.65,-14.67]]},{"t":"Cerebellum","layer":"brain","jaw":0,"pts":[[0.6,0.53,-12.15]]},{"t":"Pons (brainstem)","layer":"brain","jaw":0,"pts":[[0.37,1.98,-3.98]]},{"t":"Medulla oblongata","layer":"brain","jaw":0,"pts":[[0.15,-0.13,-5.05]]},{"t":"Frontalis","layer":"muscles","jaw":0,"pts":[[2.96,9.03,3.77],[-3.2,8.84,3.79]]},{"t":"Temporalis","layer":"muscles","jaw":0,"pts":[[7.21,6.5,-2.2],[-7.18,6.61,-2.04]]},{"t":"Orbicularis oculi","layer":"muscles","jaw":0,"pts":[[3.55,3.05,3.93],[-3.56,3.15,3.97]]},{"t":"Nasalis","layer":"muscles","jaw":0,"pts":[[0.76,1.35,5.84],[-0.83,1.38,5.78]]},{"t":"Zygomaticus major","layer":"muscles","jaw":0,"pts":[[3.79,-2.44,2.51],[-3.99,-2.12,2.58]]},{"t":"Masseter","layer":"muscles","jaw":0,"pts":[[4.77,-3.52,-1.16],[-5.02,-3.45,-1.03]]},{"t":"Orbicularis oris","layer":"muscles","jaw":0,"pts":[[-0.13,-5.21,5.28]]},{"t":"Depressor anguli oris","layer":"muscles","jaw":0,"pts":[[2.3,-6.84,3.02],[-2.54,-6.82,3.06]]},{"t":"Mentalis","layer":"muscles","jaw":0,"pts":[[0.32,-7.32,4.33]]}],"meshes":[{"name":"eyes","nv":1254,"ni":7500,"min":[-4.76334,0.62965,0.30675],"size":[9.47643,3.45766,3.65389],"offV":0,"offI":7524},{"name":"cerebrum","nv":35147,"ni":210000,"min":[-7.32884,-0.86487,-14.84434],"size":[14.57788,14.45369,18.48818],"offV":22524,"offI":233406},{"name":"hindbrain","nv":7935,"ni":48000,"min":[-5.59772,-3.60263,-12.35683],"size":[10.98145,8.56924,8.83706],"offV":653406,"offI":701016},{"name":"muscles","nv":18249,"ni":108000,"min":[-8.53622,-7.44273,-15.80511],"size":[17.01531,21.85613,21.8896],"offV":797016,"offI":906510},{"name":"cranium","nv":29041,"ni":174000,"min":[-7.88628,-6.31993,-15.58531],"size":[15.71378,20.47834,21.6928],"offV":1122510,"offI":1296756},{"name":"jaw","nv":7030,"ni":42000,"min":[-5.57383,-7.58392,-4.30182],"size":[10.96519,8.48303,9.39369],"offV":1644756,"offI":1686936},{"name":"skin","nv":7039,"ni":41997,"min":[-10.80432,-12.58601,-16.04237],"size":[21.01798,27.13753,23.99497],"offV":1770936,"offI":1813170},{"name":"hand_b_10_11","nv":252,"ni":1500,"min":[-0.04814,-0.21446,-0.15287],"size":[1.06997,0.44246,0.3697],"offV":1897164,"offI":1898676},{"name":"hand_b_11_12","nv":227,"ni":1350,"min":[-0.02603,-0.27909,-0.17109],"size":[1.03968,0.53336,0.37797],"offV":1901676,"offI":1903038},{"name":"hand_b_13_14","nv":302,"ni":1800,"min":[-0.00089,-0.15577,-0.14316],"size":[1.01187,0.32927,0.28317],"offV":1905738,"offI":1907550},{"name":"hand_b_14_15","nv":252,"ni":1500,"min":[-0.03389,-0.17127,-0.13024],"size":[1.05481,0.4227,0.34346],"offV":1911150,"offI":1912662},{"name":"hand_b_15_16","nv":227,"ni":1350,"min":[-0.02581,-0.18058,-0.1152],"size":[1.03946,0.54145,0.36292],"offV":1915662,"offI":1917024},{"name":"hand_b_17_18","nv":302,"ni":1800,"min":[-0.00896,-0.21682,-0.1521],"size":[1.02553,0.41408,0.29188],"offV":1919724,"offI":1921536},{"name":"hand_b_18_19","nv":252,"ni":1500,"min":[-0.03655,-0.22737,-0.14118],"size":[1.06255,0.48686,0.37812],"offV":1925136,"offI":1926648},{"name":"hand_b_19_20","nv":229,"ni":1350,"min":[-0.05012,-0.30381,-0.12629],"size":[1.08485,0.54557,0.31962],"offV":1929648,"offI":1931022},{"name":"hand_b_1_2","nv":352,"ni":2100,"min":[-0.01899,-0.16574,-0.18275],"size":[1.04498,0.38453,0.38832],"offV":1933722,"offI":1935834},{"name":"hand_b_2_3","nv":302,"ni":1800,"min":[-0.02877,-0.20091,-0.31536],"size":[1.08572,0.43863,0.49883],"offV":1940034,"offI":1941846},{"name":"hand_b_3_4","nv":251,"ni":1500,"min":[-0.05513,-0.21006,-0.28024],"size":[1.07646,0.39298,0.56316],"offV":1945446,"offI":1946952},{"name":"hand_b_5_6","nv":302,"ni":1800,"min":[-0.01889,-0.18973,-0.13943],"size":[1.04026,0.41403,0.32194],"offV":1949952,"offI":1951764},{"name":"hand_b_6_7","nv":252,"ni":1500,"min":[-0.05728,-0.23945,-0.18893],"size":[1.09549,0.47103,0.44262],"offV":1955364,"offI":1956876},{"name":"hand_b_7_8","nv":227,"ni":1350,"min":[-0.04338,-0.22439,-0.20641],"size":[1.05255,0.48264,0.37806],"offV":1959876,"offI":1961238},{"name":"hand_b_9_10","nv":302,"ni":1800,"min":[-0.01526,-0.1629,-0.11915],"size":[1.03104,0.36391,0.2888],"offV":1963938,"offI":1965750},{"name":"hand_palm","nv":3522,"ni":21000,"min":[-0.24803,-0.56149,-0.14988],"size":[1.29643,1.62833,0.3469],"offV":1969350,"offI":1990482}],"jawPivot":[0.0,0.8408003349546529,-3.800182937390197],"demoHand":[[-248.6,-116.19,811.79],[-278.75,-121.72,803.68],[-305.81,-145.71,775.22],[-314.44,-157.55,749.44],[-323.17,-167.71,730.49],[-288.95,-133.61,731.3],[-299.21,-149.93,697.44],[-306.37,-168.0,683.89],[-308.75,-182.73,673.18],[-267.93,-134.47,732.4],[-272.89,-156.64,695.03],[-276.21,-176.1,674.12],[-278.41,-191.1,664.84],[-247.81,-135.59,737.37],[-249.81,-154.79,700.59],[-251.36,-175.56,680.8],[-250.7,-190.4,676.3],[-230.44,-137.97,744.3],[-226.64,-153.35,714.51],[-223.07,-166.19,698.03],[-222.17,-177.45,687.47]],"fit":{"33":[-4.446,2.664,3.173],"263":[4.446,2.664,3.173],"133":[-1.856,2.585,3.758],"362":[1.856,2.585,3.758],"1":[0.0,-1.127,7.476],"2":[0.0,-2.089,6.058],"168":[0.0,3.271,5.236],"10":[0.0,8.262,4.482],"152":[0.0,-9.403,4.264],"234":[-7.664,0.673,-2.436],"454":[7.664,0.673,-2.436],"61":[-2.456,-4.343,4.284],"291":[2.456,-4.343,4.284]}}</script>
@@ -784,7 +881,7 @@ function drawFxMark(g, hands, sides, now) {
     g.strokeStyle = "rgba(255,93,115," + (0.95 - 0.35 * pulse).toFixed(2) + ")"; g.lineWidth = 3;
     g.beginPath(); g.arc(p[0], p[1], r, 0, 6.3); g.stroke();
     g.fillStyle = "rgba(255,93,115,.22)"; g.beginPath(); g.arc(p[0], p[1], r * 0.62, 0, 6.3); g.fill();
-    const t = "JJ · " + FX_SITE[J.bone] + " fracture";
+    const t = "J Ray · " + FX_SITE[J.bone] + " fracture";
     g.font = "700 13px system-ui,-apple-system,Segoe UI,Roboto,sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
     g.strokeStyle = "rgba(4,7,13,.9)"; g.lineWidth = 4; g.lineJoin = "round"; g.strokeText(t, p[0], p[1] + r + 14);
     g.fillStyle = "#ff8fa0"; g.fillText(t, p[0], p[1] + r + 14);
@@ -985,25 +1082,27 @@ $("start").onclick = async () => {
 if (DEMO) boot().then(demoLoop).catch(e => setStatus("Demo failed: " + e.message, "bad"));
 </script>
 <script>
-// ====================== JJ Fracture Lab (JJ Pattern, by Jyotish Jha) ======================
+// ====================== J Ray Fracture Lab (by Jyotish Jha) ======================
 (function () {
   const $ = id => document.getElementById(id);
   const JJ = window.JJ = { mark: false, hand: "left", bone: "radius" };
 
   // ---------- tabs ----------
-  const tabs = { mirror: $("mirrorView"), lab: $("labView") };
+  const tabs = { mirror: $("mirrorView"), lab: $("labView"), health: $("healthView") };
   function showTab(name) {
     for (const k in tabs) { tabs[k].hidden = k !== name; $("tab_" + k).setAttribute("aria-selected", k === name); }
     try { localStorage.setItem("jj_tab", name); } catch (e) {}
-    if (name === "lab") requestAnimationFrame(redraw);
+    if (name === "lab") requestAnimationFrame(() => { redraw(); lay3(); });
+    if (name === "health" && window.RayJ) window.RayJ.show();
   }
+  $("tab_health").onclick = () => showTab("health");
   $("tab_mirror").onclick = () => showTab("mirror");
   $("tab_lab").onclick = () => showTab("lab");
 
   // ---------- case form ----------
   const FIELDS = { date: "", age: "", hand: "left", bone: "radius", pieces: false, joint: false, ulna: false, volar: false, open: false, numb: false, pain: false,
                    cr: 0, crdate: "", held: "unknown", tilt: "", tiltdir: "dorsal", incl: "", short: "", step: "", plan: "undecided", sx: "", smoke: false, diab: false, mark: false };
-  let C = Object.assign({}, FIELDS, window.JJ_PRESET || {});
+  let C = Object.assign({}, FIELDS, (window.JJ_PRESET || {}).case || {});
   try { const s = JSON.parse(localStorage.getItem("jj_case") || "null"); if (s) C = Object.assign({}, FIELDS, s); } catch (e) {}
   const el = k => k === "mark" ? $("jjmark") : $("c_" + k);
   function saveCase() { try { localStorage.setItem("jj_case", JSON.stringify(C)); } catch (e) {} }
@@ -1108,7 +1207,7 @@ if (DEMO) boot().then(demoLoop).catch(e => setStatus("Demo failed: " + e.message
       ? ["amber", "In position now, but at high risk of slipping", "Your entered values are within limits, but " + A.signs.length + " instability signs are present. Insist on check X-rays at weeks 1, 2 and 3. If it slips, fixation is the next step."]
       : ["green", "Plaster treatment is on track", "Your entered values are within the accepted limits and the bone held. Keep the weekly check X-rays for the first three weeks."];
     else v = ["amber", "Within limits so far. Confirm it is holding", "The values you entered are acceptable, but the lab does not know whether the position held after the last CR. That check X-ray decides plaster versus fixation."];
-    R.push('<div class="verdict ' + v[0] + '"><div class="k">JJ Pattern result</div><div class="h">' + v[1] + '</div><div>' + v[2] + "</div></div>");
+    R.push('<div class="verdict ' + v[0] + '"><div class="k">J Ray result</div><div class="h">' + v[1] + '</div><div>' + v[2] + "</div></div>");
 
     // 2 clock
     P("Your clock", '<div class="clock"><div><b>' + (A.days == null ? "?" : A.days) + '</b><span>days since the accident</span></div><div><b>' + A.cr + '</b><span>CR attempts</span></div><div><b>' +
@@ -1203,7 +1302,7 @@ if (DEMO) boot().then(demoLoop).catch(e => setStatus("Demo failed: " + e.message
   const cur = () => X.imgs[X.cur];
 
   function addFiles(files) {
-    for (const f of files) if (f.type.startsWith("image/")) X.imgs.push({ url: URL.createObjectURL(f), name: f.name, view: "pa", meas: [], scale: null });
+    for (const f of files) if (f.type.startsWith("image/")) X.imgs.push({ url: URL.createObjectURL(f), name: f.name, view: "pa", date: "", stage: "check", meas: [], scale: null });
     if (X.imgs.length) { if (X.cur < 0) X.cur = 0; else X.cur = X.imgs.length - 1; openImg(); }
   }
   $("xpick").onclick = $("xadd").onclick = () => $("xfile").click();
@@ -1215,10 +1314,11 @@ if (DEMO) boot().then(demoLoop).catch(e => setStatus("Demo failed: " + e.message
   function openImg() {
     const im = cur(); X.pend = [];
     $("drop").hidden = true; inner.hidden = false; $("xcontrols").hidden = false; $("measurepanel").hidden = false;
-    ximg.onload = () => { im.w = ximg.naturalWidth; im.h = ximg.naturalHeight; layout(); };
-    ximg.src = im.url; $("xview").value = im.view;
+    ximg.onload = () => { im.w = ximg.naturalWidth; im.h = ximg.naturalHeight; layout(); lay3(); };
+    ximg.src = im.url; $("xview").value = im.view; $("xdate").value = im.date; $("xstage").value = im.stage;
+    $("v3dpanel").hidden = false; $("seriespanel").hidden = false;
     $("thumbs").innerHTML = "";
-    X.imgs.forEach((m, i) => { const b = document.createElement("button"); b.type = "button"; b.textContent = (i + 1) + " · " + m.name; b.className = i === X.cur ? "on" : "";
+    X.imgs.forEach((m, i) => { const b = document.createElement("button"); b.type = "button"; b.textContent = (m.date ? fmt(pd(m.date)) + " · " : (i + 1) + " · ") + m.name; b.className = i === X.cur ? "on" : "";
       b.onclick = () => { X.cur = i; openImg(); }; $("thumbs").appendChild(b); });
     listMeas(); prompt();
   }
@@ -1227,10 +1327,13 @@ if (DEMO) boot().then(demoLoop).catch(e => setStatus("Demo failed: " + e.message
     const z = parseFloat($("xzoom").value), fit = Math.min(viewer.clientWidth / im.w, viewer.clientHeight / im.h);
     inner.style.width = Math.max(40, Math.round(im.w * fit * z)) + "px";
     ximg.style.filter = "brightness(" + $("xbright").value + ") contrast(" + $("xcontrast").value + ")" + ($("xinvert").checked ? " invert(1)" : "");
+    for (const f of [$("faceF"), $("faceS")]) f.style.filter = ximg.style.filter;
     redraw();
   }
   for (const id of ["xzoom", "xbright", "xcontrast", "xinvert"]) $(id).addEventListener("input", layout);
-  $("xview").onchange = e => { cur().view = e.target.value; };
+  $("xview").onchange = e => { cur().view = e.target.value; lay3(); series(); };
+  $("xdate").onchange = e => { cur().date = e.target.value; series(); };
+  $("xstage").onchange = e => { cur().stage = e.target.value; series(); };
   new ResizeObserver(layout).observe(viewer);
 
   // geometry in natural image pixels
@@ -1259,7 +1362,71 @@ if (DEMO) boot().then(demoLoop).catch(e => setStatus("Demo failed: " + e.message
       x.type = "button"; x.textContent = "Remove"; x.onclick = () => { im.meas.splice(i, 1); if (m.type === "scale") im.scale = null; listMeas(); redraw(); };
       row.append(s, x); box.appendChild(row);
     });
+    series();
   }
+
+  // ---------- film series: change between X-rays ----------
+  const STAGE = { injury: "Injury film", postcr: "After CR", check: "Check", postop: "After surgery", other: "Other" };
+  function series() {
+    const films = X.imgs.map((im, i) => { const o = { im, i, tilt: null, incl: null };
+      for (const m of im.meas) { const v = value(m, im); if (m.type === "tilt") o.tilt = v.dir === "volar" ? v.deg : -v.deg; if (m.type === "incl") o.incl = v.deg; }
+      return o; }).sort((a, b) => (a.im.date || "9") < (b.im.date || "9") ? -1 : (a.im.date || "9") > (b.im.date || "9") ? 1 : a.i - b.i);
+    const tl = t => t == null ? "not measured" : Math.abs(t).toFixed(1) + "° " + (t >= 0 ? "volar" : "dorsal");
+    let h = '<div class="tablewrap"><table><tr><th>Date</th><th>Taken</th><th>Tilt</th><th>Inclination</th></tr>' + films.map(f =>
+      "<tr><td>" + (f.im.date ? fmt(pd(f.im.date)) : "no date") + "</td><td>" + STAGE[f.im.stage] + "</td><td><b>" + tl(f.tilt) + "</b></td><td><b>" + (f.incl == null ? "not measured" : f.incl.toFixed(1) + "°") + "</b></td></tr>").join("") + "</table></div>";
+    const notes = [];
+    for (const [k, lim, name] of [["tilt", 10, "Tilt"], ["incl", 5, "Radial inclination"]]) {
+      const s = films.filter(f => f[k] != null);
+      for (let n = 1; n < s.length; n++) {
+        const a = s[n - 1], b = s[n], d = b[k] - a[k], when = (a.im.date ? fmt(pd(a.im.date)) : "film " + (a.i + 1)) + " to " + (b.im.date ? fmt(pd(b.im.date)) : "film " + (b.i + 1));
+        const setBetween = b.im.stage === "postcr" || b.im.stage === "postop";
+        if (Math.abs(d) < lim) notes.push(pill("ok", "steady") + " " + name + " changed " + Math.abs(d).toFixed(1) + "° from " + when + ". That is inside measuring error; the position held.");
+        else if (setBetween) notes.push(pill("now", "re-set") + " " + name + " changed " + Math.abs(d).toFixed(1) + "° from " + when + ", across a CR or operation.");
+        else notes.push(pill("bad", "moved") + " " + name + " changed " + Math.abs(d).toFixed(1) + "° from " + when + " with no setting in between. The break has slipped; plaster is not holding it.");
+      }
+    }
+    h += notes.length ? "<ul>" + notes.map(n => "<li>" + n + "</li>").join("") + "</ul>"
+      : '<p class="small" style="margin-top:8px">Measure the same angle on two or more dated films and J Ray will tell you whether the bone held or slipped between them.</p>';
+    h += '<p class="small" style="margin-top:8px">What to expect next: a set bone slips mostly in the first two weeks. A position that is unchanged at three weeks almost never moves afterwards, because callus has locked it. Measuring through plaster is rough, so treat changes under ' + "5 to 10° as no change.</p>";
+    $("series").innerHTML = h;
+  }
+
+  // ---------- 3D corner view ----------
+  const V3 = { rx: -14, ry: 38, spin: false };
+  function parts() {            // which film (and which half of it) goes on the front and side walls
+    const im = cur(); if (!im || !im.w) return null;
+    const half = (m, side) => ({ im: m, side, asp: (side ? m.w / 2 : m.w) / m.h });
+    if (im.view === "both_fs") return { f: half(im, "l"), s: half(im, "r") };
+    if (im.view === "both_sf") return { f: half(im, "r"), s: half(im, "l") };
+    const want = im.view === "lat" ? "pa" : "lat";
+    const mate = X.imgs.filter(m => m !== im && m.w && m.view === want).sort((a, b) => Math.abs((pd(a.date) || 0) - (pd(im.date) || 0)) - Math.abs((pd(b.date) || 0) - (pd(im.date) || 0)))[0];
+    if (im.view === "lat") return { f: mate ? half(mate) : null, s: half(im) };
+    return { f: half(im), s: mate ? half(mate) : null };
+  }
+  function lay3() {
+    const p = parts(), box = $("v3d"); if (!p || !box.clientWidth) return;
+    const H0 = box.clientHeight * 0.66, wf0 = p.f ? H0 * p.f.asp : 0, ws0 = p.s ? H0 * p.s.asp : 0;
+    const k = Math.min(1, box.clientWidth * 0.8 / Math.max(wf0 + ws0 * 0.6, 1)), H = H0 * k, wf = wf0 * k, ws = ws0 * k;
+    const face = (el, q, w) => { el.hidden = !q; if (!q) return;
+      el.style.cssText += ";width:" + w + "px;height:" + H + "px;top:" + (-H / 2) + "px;background-image:url('" + q.im.url + "');background-size:" + (q.side ? "200% 100%" : "100% 100%") +
+        ";background-position:" + (q.side === "r" ? "100% 0" : "0 0"); };
+    face($("faceF"), p.f, wf); face($("faceS"), p.s, ws);
+    $("faceF").style.left = -wf + "px"; $("faceS").style.left = "0px";
+    $("pivot3").style.transform = "translate3d(" + (wf / 2) + "px,0," + (-ws / 2) + "px)";
+    $("x3note").textContent = p.f && p.s ? "Front and side films joined at the corner." : "Only one view found. Add or tag the other view to build the corner.";
+    turn3();
+  }
+  function turn3() { $("scene3").style.transform = "scale(" + $("x3zoom").value + ") rotateX(" + V3.rx + "deg) rotateY(" + V3.ry + "deg)"; }
+  (function () {
+    const box = $("v3d"); let last = null;
+    box.addEventListener("pointerdown", e => { last = [e.clientX, e.clientY]; box.setPointerCapture(e.pointerId); V3.spin = false; $("x3spin").classList.remove("on"); });
+    box.addEventListener("pointermove", e => { if (!last) return; V3.ry += (e.clientX - last[0]) * 0.5; V3.rx = Math.max(-80, Math.min(80, V3.rx - (e.clientY - last[1]) * 0.4)); last = [e.clientX, e.clientY]; turn3(); });
+    const up = () => { last = null; }; box.addEventListener("pointerup", up); box.addEventListener("pointercancel", up);
+    $("x3zoom").addEventListener("input", turn3);
+    $("x3reset").onclick = () => { V3.rx = -14; V3.ry = 38; $("x3zoom").value = 1; turn3(); };
+    $("x3spin").onclick = () => { V3.spin = !V3.spin; $("x3spin").classList.toggle("on", V3.spin); if (V3.spin) (function step() { if (!V3.spin) return; V3.ry += 0.4; turn3(); requestAnimationFrame(step); })(); };
+    new ResizeObserver(lay3).observe(box);
+  })();
   function prompt() {
     const t = X.tool; viewer.classList.toggle("tooling", !!t);
     for (const b of $("tools").querySelectorAll("[data-tool]")) b.classList.toggle("on", b.dataset.tool === t);
@@ -1319,11 +1486,198 @@ if (DEMO) boot().then(demoLoop).catch(e => setStatus("Demo failed: " + e.message
     if (X.tool && TOOLS[X.tool]) draw(X.tool, X.pend, null);
   }
 
+  // films shipped with a personal copy
+  for (const f of (window.JJ_PRESET || {}).films || []) X.imgs.push({ url: f.src, name: f.name, view: f.view, date: f.date, stage: f.stage, meas: [], scale: null });
+  if (X.imgs.length) { X.cur = X.imgs.length - 1; openImg(); }
+  window.JJ_CASE = () => C;
+
   // ---------- boot ----------
   fillForm(); JJ.mark = C.mark; JJ.hand = C.hand; JJ.bone = C.bone; render();
   let tab = "mirror"; try { tab = localStorage.getItem("jj_tab") || tab; } catch (e) {}
   if (location.hash === "#lab") tab = "lab"; if (location.hash === "#demo") tab = "mirror";
-  showTab(tab === "lab" ? "lab" : "mirror");
+  if (location.hash === "#health") tab = "health";
+  showTab(tabs[tab] ? tab : "mirror");
+})();
+</script>
+<script>
+// ====================== Ray J health tracker (by Jyotish Jha) ======================
+(function () {
+  const $ = id => document.getElementById(id);
+  const PF = { sex: "m", age: "", height: "", act: "1.4", chest: "", chestx: "", diet: "veg", city: "28.61,77.21", aqi: "" };
+  const pre = (window.JJ_PRESET || {}).health || {};
+  let D = { p: Object.assign({}, PF, pre.p || {}), log: (pre.log || []).slice(), habits: {}, water: {} };
+  try { const s = JSON.parse(localStorage.getItem("jj_health") || "null"); if (s) { D = s; D.p = Object.assign({}, PF, s.p); } } catch (e) {}
+  const save = () => { try { localStorage.setItem("jj_health", JSON.stringify(D)); } catch (e) {} };
+  const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  const TODAY = iso(new Date());
+  const pd = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const fmt = s => pd(s).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+  const n = v => v === "" || v == null || isNaN(parseFloat(v)) ? null : parseFloat(v);
+  const pill = (c, t) => '<span class="pill ' + c + '">' + t + "</span>";
+  const sorted = () => D.log.slice().sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : 0);
+  const latest = k => { const s = sorted().filter(e => e[k] != null); return s[s.length - 1] || null; };
+
+  for (const k in PF) { const e = $("h_" + k); e.value = D.p[k]; e.addEventListener("input", () => { D.p[k] = e.value; save(); if (k === "city" || k === "aqi") air(); render(); }); }
+  $("e_d").value = TODAY;
+  $("e_add").onclick = () => {
+    const e = { d: $("e_d").value || TODAY, w: n($("e_w").value), sys: n($("e_sys").value), dia: n($("e_dia").value), pul: n($("e_pul").value), glu: n($("e_glu").value), glut: $("e_glut").value };
+    if (e.w == null && e.sys == null && e.pul == null && e.glu == null) { $("e_msg").textContent = "Enter at least one value."; return; }
+    if ((e.sys == null) !== (e.dia == null)) { $("e_msg").textContent = "Blood pressure needs both numbers."; return; }
+    D.log.push(e); save(); for (const id of ["e_w", "e_sys", "e_dia", "e_pul", "e_glu"]) $(id).value = "";
+    $("e_msg").textContent = "Saved."; render();
+  };
+
+  // ---------- air quality ----------
+  const AQ = { state: "idle", pm: null, aqi: null, src: "" };
+  const BP25 = [[0, 30, 0, 50], [30, 60, 51, 100], [60, 90, 101, 200], [90, 120, 201, 300], [120, 250, 301, 400], [250, 380, 401, 500]];
+  const pmToAqi = pm => { for (const [a, b, lo, hi] of BP25) if (pm <= b) return Math.round(lo + (pm - a) / (b - a) * (hi - lo)); return 500; };
+  const AQBAND = [[50, "Good", "ok"], [100, "Satisfactory", "ok"], [200, "Moderate", "now"], [300, "Poor", "bad"], [400, "Very poor", "bad"], [9999, "Severe", "bad"]];
+  const band = a => AQBAND.find(b => a <= b[0]);
+  let airSeq = 0;
+  async function air() {
+    const manual = n(D.p.aqi), seq = ++airSeq;
+    if (manual != null) { AQ.state = "ok"; AQ.aqi = manual; AQ.pm = null; AQ.src = "typed by you"; return render(); }
+    AQ.state = "loading"; render();
+    try {
+      let ll = D.p.city;
+      if (ll === "here") ll = await new Promise((res, rej) => navigator.geolocation ? navigator.geolocation.getCurrentPosition(p => res(p.coords.latitude.toFixed(2) + "," + p.coords.longitude.toFixed(2)), () => rej(new Error("location"))) : rej(new Error("location")));
+      const [la, lo] = ll.split(",");
+      const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 9000);
+      const r = await fetch("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=" + la + "&longitude=" + lo + "&current=pm2_5,pm10&timezone=auto", { signal: ac.signal });
+      clearTimeout(tm);
+      const j = await r.json(); if (seq !== airSeq) return;
+      AQ.pm = j.current.pm2_5; AQ.aqi = pmToAqi(AQ.pm); AQ.state = "ok"; AQ.src = "live, Open-Meteo model";
+    } catch (e) { if (seq !== airSeq) return; AQ.state = "fail"; }
+    render();
+  }
+
+  // ---------- reading the numbers ----------
+  function read() {
+    const p = D.p, R = { h: n(p.height), age: n(p.age), w: latest("w"), bp: latest("sys"), pul: latest("pul"), glu: latest("glu") };
+    const W = R.w && R.w.w;
+    if (R.h && W) {
+      const m = R.h / 100; R.bmi = W / (m * m); R.lo = 18.5 * m * m; R.hi = 24.9 * m * m;
+      R.bmiBand = R.bmi < 16 ? ["Severely underweight", "bad"] : R.bmi < 18.5 ? ["Underweight", "bad"] : R.bmi < 25 ? ["Healthy weight", "ok"] : R.bmi < 30 ? ["Overweight", "now"] : ["Obese", "bad"];
+      if (R.age) {
+        const bmr = 10 * W + 6.25 * R.h - 5 * R.age + (p.sex === "m" ? 5 : -161);
+        R.tdee = bmr * parseFloat(p.act);
+        R.kcal = Math.round((R.tdee + (R.bmi < 18.5 ? 400 : R.bmi >= 25 ? -400 : 0)) / 50) * 50;
+        R.kcal = Math.max(R.kcal, Math.round(bmr / 50) * 50);
+      }
+      const C = window.JJ_CASE ? window.JJ_CASE() : null;
+      R.healing = !!(C && C.date && (new Date() - pd(C.date)) / 864e5 < 120);
+      const refW = R.bmi >= 25 ? R.hi : W;
+      R.prot = Math.round(refW * (R.healing || R.bmi < 18.5 ? 1.5 : 1.0));
+      R.water = Math.max(2, Math.round(W * 0.035 * 10) / 10);
+    }
+    if (R.bp) { const s = R.bp.sys, d = R.bp.dia;
+      R.bpBand = s >= 180 || d >= 120 ? ["Very high: see a doctor today", "bad"] : s >= 140 || d >= 90 ? ["High", "bad"] : s < 90 || d < 60 ? ["Low", "now"] : s >= 130 || d >= 85 ? ["Upper-normal: recheck", "now"] : ["Normal", "ok"]; }
+    if (R.pul) { const v = R.pul.pul; R.pulBand = v > 100 ? ["Fast for a resting pulse", "now"] : v < 50 ? ["Slow", "now"] : ["Normal", "ok"]; }
+    if (R.glu) { const v = R.glu.glu, t = R.glu.glut;
+      R.gluBand = v < 70 ? ["Low: eat something sweet now", "bad"]
+        : t === "fasting" ? (v < 100 ? ["Normal", "ok"] : v < 126 ? ["Borderline (prediabetes range)", "now"] : ["High: needs a lab test", "bad"])
+        : (v < 140 ? ["Normal", "ok"] : v < 200 ? ["Borderline: check fasting sugar", "now"] : ["High: needs a lab test", "bad"]); }
+    const c = n(p.chest), cx = n(p.chestx);
+    if (c && cx) { R.exp = (cx - c) * 2.54; R.expBand = R.exp >= 5 ? ["Normal", "ok"] : R.exp >= 2.5 ? ["A little low", "now"] : ["Low", "bad"]; }
+    return R;
+  }
+
+  function spark(key, color) {
+    const s = sorted().filter(e => e[key] != null); if (s.length < 2) return "";
+    const v = s.map(e => e[key]), lo = Math.min(...v), hi = Math.max(...v), sp = hi - lo || 1;
+    const pt = (x, i) => (4 + i / (v.length - 1) * 292).toFixed(1) + "," + (56 - (x - lo) / sp * 46).toFixed(1);
+    return '<svg class="spark" viewBox="0 0 300 64" preserveAspectRatio="none" role="img" aria-label="trend"><polyline fill="none" stroke="' + color + '" stroke-width="2" vector-effect="non-scaling-stroke" points="' + v.map(pt).join(" ") + '"/></svg>' +
+      '<div class="small" style="display:flex;justify-content:space-between"><span>' + fmt(s[0].d) + ": " + v[0] + "</span><span>" + fmt(s[s.length - 1].d) + ": " + v[v.length - 1] + "</span></div>";
+  }
+
+  function render() {
+    const R = read(), p = D.p;
+    const card = (k, v, b, s) => '<div class="card"><span class="k">' + k + '</span><span class="v">' + v + "</span>" + (b ? "<span>" + pill(b[1], b[0]) + "</span>" : "") + '<span class="s">' + s + "</span></div>";
+    const on = e => e ? fmt(e.d) : "";
+    const a = AQ.state === "ok" ? band(AQ.aqi) : null;
+    $("h_cards").innerHTML =
+      card("Body mass index", R.bmi ? R.bmi.toFixed(1) : "?", R.bmiBand, R.bmi ? R.w.w + " kg at " + R.h + " cm. Healthy range for your height: " + Math.ceil(R.lo) + " to " + Math.floor(R.hi) + " kg." : "Add height and a weight.") +
+      card("Blood pressure", R.bp ? R.bp.sys + "/" + R.bp.dia + " <small>mmHg</small>" : "?", R.bpBand, R.bp ? "Taken " + on(R.bp) + ". Normal is under 120/80." : "Add a reading.") +
+      card("Pulse", R.pul ? R.pul.pul + " <small>per min</small>" : "?", R.pulBand, R.pul ? "Taken " + on(R.pul) + ". Resting range 60 to 100." : "Add a reading.") +
+      card("Blood sugar", R.glu ? R.glu.glu + " <small>mg/dL</small>" : "?", R.gluBand, R.glu ? { random: "Random", fasting: "Fasting", pp: "2 h after meal" }[R.glu.glut] + ", " + on(R.glu) + ". Normal: fasting under 100, otherwise under 140." : "Add a reading.") +
+      card("Chest expansion", R.exp != null ? R.exp.toFixed(1) + " <small>cm</small>" : "?", R.expBand, R.exp != null ? p.chest + " to " + p.chestx + " in. Healthy adults expand 5 cm or more." : "Add both chest measurements.") +
+      card("Air today", AQ.state === "ok" ? AQ.aqi + " <small>AQI</small>" : AQ.state === "loading" ? "…" : "?", a && [a[1], a[2]],
+        AQ.state === "ok" ? (AQ.pm != null ? "PM2.5 " + Math.round(AQ.pm) + " µg/m³, " + (AQ.pm / 15).toFixed(0) + "× the WHO daily limit. " : "") + "Source: " + AQ.src + "."
+        : AQ.state === "fail" ? "Could not fetch live air data. Type today's AQI in About you." : "Fetching…");
+
+    // ----- coach -----
+    const H = [], P = (t, b) => H.push('<div class="panel"><h3>' + t + "</h3>" + b + "</div>");
+    const flags = [];
+    if (R.bmi && R.bmi < 18.5) flags.push("<b>Weight is the main thing to fix.</b> At BMI " + R.bmi.toFixed(1) + " you are about " + Math.ceil(R.lo - R.w.w) + " kg under the healthy range. Low reserves mean slower bone and wound healing and more muscle loss while a limb is immobilised. If your weight has stayed this low for years while eating normally, ask a doctor for a basic work-up: blood count, thyroid (TSH), vitamin D and B12, sugar, and a check for gut absorption problems or chronic infection.");
+    if (R.bmi && R.bmi >= 25) flags.push("<b>Weight is above the healthy range</b> by about " + Math.ceil(R.w.w - R.hi) + " kg. A slow loss of half a kilo a week is the target; the calories below already include that.");
+    if (R.pul && R.pul.pul > 100) flags.push("<b>Pulse " + R.pul.pul + " is fast for rest.</b> Pain, anxiety, fever, dehydration, tea or coffee and anaemia all do this. Sit quietly for five minutes and measure again. If it stays above 100 on several days, tell your doctor; it also matters to the anaesthetist before any surgery.");
+    if (R.bp && R.bpBand[1] !== "ok") flags.push("<b>Blood pressure " + R.bp.sys + "/" + R.bp.dia + ": " + R.bpBand[0].toLowerCase() + ".</b> " + (R.bpBand[0].startsWith("Upper") ? "One reading taken in pain or after walking means little. Measure seated, after five minutes rest, on three different days. If the lower number stays at 85 or more, cut salt and get it reviewed." : "Repeat it properly seated and rested, and show the log to a doctor."));
+    if (R.glu && R.gluBand[1] !== "ok") flags.push("<b>Sugar " + R.glu.glu + ": " + R.gluBand[0].toLowerCase() + ".</b> A finger-prick meter can be off by 10 to 15%. Confirm with a lab fasting sugar and HbA1c.");
+    if (R.exp != null && R.exp < 5) flags.push("<b>Chest expansion " + R.exp.toFixed(1) + " cm is on the low side.</b> Tape-measure technique changes this a lot. Do the breathing drill in the habits list daily and re-measure in two weeks.");
+    if (a && AQ.aqi > 200) flags.push("<b>The air is " + a[1].toLowerCase() + " today.</b> See the air section below.");
+    P("What Ray J would flag", flags.length ? "<ul>" + flags.map(f => "<li>" + f + "</li>").join("") + "</ul>" : "<p>" + (R.bmi || R.bp || R.glu ? "Nothing out of range in your latest readings." : "Add your height, age and a first reading to get your personal read-out.") + "</p>");
+
+    if (R.kcal) {
+      const f = R.kcal / 2500, q = x => Math.max(1, Math.round(x * f)), g = x => Math.round(x * f / 10) * 10;
+      const veg = p.diet === "veg", egg = p.diet !== "veg", meat = p.diet === "nonveg";
+      P("Your daily targets", '<div class="targets"><div><b>' + R.kcal + '</b><span>kcal of food</span></div><div><b>' + R.prot + ' g</b><span>protein</span></div><div><b>' + R.water.toFixed(1) + ' L</b><span>water, about ' + Math.round(R.water * 4) +
+        ' glasses</span></div><div><b>1000 mg</b><span>calcium</span></div></div><p class="small" style="margin-top:10px">Your body burns about ' + Math.round(R.tdee / 10) * 10 + " kcal a day at this activity level. " +
+        (R.bmi < 18.5 ? "The target adds about 400 to gain roughly 0.3 to 0.4 kg a week. If the scale has not moved after two weeks, add another 200." : R.bmi >= 25 ? "The target removes about 400 for a slow, steady loss." : "The target holds your weight steady.") +
+        (R.healing ? " Protein is set at 1.5 g per kg because a fracture is healing." : "") + " Drink more water on days you sweat; pale-yellow urine is the simple check.</p>");
+      const rows = [
+        ["On waking", "2 glasses of water, " + q(8) + " soaked almonds, 1 banana"],
+        ["Breakfast", (egg ? q(3) + " eggs (omelette or boiled) with " + q(2) + " parathas or toast" : q(3) + " besan or moong chillas with paneer filling, or " + q(4) + " idlis with sambar") + ", 1 glass of milk"],
+        ["Mid-morning", "1 fruit, " + g(40) + " g roasted chana or peanuts, 1 glass of lassi or chaas"],
+        ["Lunch", q(3) + " rotis or " + q(2) + " katoris of rice, 1 large katori of thick dal or rajma or chole, seasonal sabzi, curd, salad" + (meat ? ", " + g(120) + " g chicken or fish" : "") + ", 1 tsp ghee"],
+        ["Evening", "Banana and peanut-butter milkshake or sattu drink, plus sprouts chaat or " + q(2) + " slices of bread with paneer"],
+        ["Dinner", q(3) + " rotis, " + (meat ? g(120) + " g chicken, fish or egg curry" : egg ? "egg curry (2 eggs) or " + g(100) + " g paneer" : g(100) + " g paneer, tofu or soya chunks") + ", sabzi, dal"],
+        ["Before bed", "1 glass of warm milk with haldi, 2 dates"]];
+      P("What to eat today (" + { veg: "vegetarian", egg: "vegetarian with eggs", nonveg: "non-vegetarian" }[p.diet] + ")", '<ul class="steps">' + rows.map(r => '<li><span class="when">' + r[0] + '</span><span class="what">' + r[1] + "</span></li>").join("") + "</ul>" +
+        '<p class="small" style="margin-top:8px">Portions are scaled to about ' + R.kcal + " kcal and are approximate. " + (R.bmi < 18.5 ? "To gain, never skip the three small meals between the main ones; liquid calories (milk, shakes, lassi) are the easiest to add. " : "") +
+        "Milk, curd, paneer, ragi and til cover most of the calcium. If you cannot reach the protein target from food, one scoop of whey or a sattu drink fills the gap. Kidney disease, diabetes or allergies change this plan: check with a dietitian.</p>");
+    } else P("Your daily targets", "<p>Add height, age and a weight reading and Ray J will set calories, protein and water for you.</p>");
+
+    // habits
+    const day = D.habits[TODAY] || {}, glasses = D.water[TODAY] || 0, goal = R.water ? Math.round(R.water * 4) : 10;
+    const HAB = [["meals", "Ate all main meals and snacks"], ["protein", "Protein at every meal"], ["sun", "15 to 20 min of morning sunlight"], ["move", R.healing ? "Finger, elbow and shoulder exercises, hourly" : "30 min walk or exercise"],
+      ["breath", "Deep-breathing drill: 10 slow full breaths, 3 times"], ["sleep", "7 to 8 hours of sleep"], ["notobacco", "No tobacco, no alcohol"], ["weigh", "Weighed myself this week"]];
+    let streak = 0; for (let d = new Date(); ; d.setDate(d.getDate() - 1)) { const h = D.habits[iso(d)]; if (h && Object.values(h).filter(Boolean).length >= 5) streak++; else if (iso(d) !== TODAY) break; if (streak > 400) break; }
+    P("Today's habits", '<div class="water"><b>Water</b><span class="glasses">' + Array.from({ length: goal }, (_, i) => '<i class="' + (i < glasses ? "f" : "") + '"></i>').join("") + '</span><span class="small">' + glasses + " of " + goal +
+      ' glasses</span><button class="btn" id="w_add" type="button">+ 1 glass</button><button class="btn" id="w_sub" type="button" aria-label="Remove one glass">−</button></div><div class="habits" style="margin-top:12px">' +
+      HAB.map(h => '<label class="ck"><input type="checkbox" data-hab="' + h[0] + '"' + (day[h[0]] ? " checked" : "") + ">" + h[1] + "</label>").join("") + '</div><p class="small" style="margin-top:10px">' +
+      (streak ? "Streak: " + streak + " day" + (streak > 1 ? "s" : "") + " with five or more habits done." : "Tick five or more in a day to start a streak.") + "</p>");
+
+    // air
+    if (AQ.state === "ok") {
+      const v = AQ.aqi;
+      P("The air you are breathing", "<p><b>AQI " + v + ", " + a[1].toLowerCase() + ".</b> " +
+        (v <= 100 ? "Fine for everyone. Exercise outdoors freely." : v <= 200 ? "Acceptable for most people. Those with asthma or heart disease should keep hard outdoor exercise short."
+          : v <= 300 ? "Unhealthy with prolonged exposure. Move exercise indoors and wear an N95 for long periods outside."
+          : v <= 400 ? "Unhealthy for everyone. A day in this air is roughly like smoking several cigarettes. Stay in when you can, N95 outside, windows shut in the early morning and evening."
+          : "Severe. Avoid going out unless necessary, N95 every time you do, no outdoor exercise at all, run an air purifier in the room you sleep in.") + "</p>" +
+        (v > 200 ? "<ul><li><b>Short term:</b> cough, burning eyes and throat, breathlessness, headaches, poor sleep, more chest infections.</li><li><b>Long term:</b> lower lung capacity, higher risk of heart disease and stroke.</li>" +
+          "<li><b>For healing:</b> smog blocks the sunlight that makes vitamin D, and keeps you from moving outdoors. Get a vitamin D level checked and eat well; studies also link years of dirty air to weaker bones.</li>" +
+          "<li><b>Before surgery:</b> tell the anaesthetist about any cough, wheeze or chest tightness.</li><li><b>What helps:</b> a fitted N95 (cloth and surgical masks do little), a purifier or at least a closed room for sleep, steam for the throat, no smoking, no incense or mosquito coils indoors.</li></ul>" : ""));
+    }
+    $("h_coach").innerHTML = H.join("");
+    for (const c of $("h_coach").querySelectorAll("[data-hab]")) c.onchange = () => { (D.habits[TODAY] = D.habits[TODAY] || {})[c.dataset.hab] = c.checked; save(); render(); };
+    $("w_add").onclick = () => { D.water[TODAY] = glasses + 1; save(); render(); };
+    $("w_sub").onclick = () => { D.water[TODAY] = Math.max(0, glasses - 1); save(); render(); };
+
+    // log
+    const s = sorted().reverse();
+    $("h_log").innerHTML = (s.length ? '<div class="tablewrap rep"><table><tr><th>Date</th><th>kg</th><th>BP</th><th>Pulse</th><th>Sugar</th><th></th></tr>' + s.map(e =>
+      "<tr><td>" + fmt(e.d) + "</td><td>" + (e.w ?? "") + "</td><td>" + (e.sys != null ? e.sys + "/" + e.dia : "") + "</td><td>" + (e.pul ?? "") + "</td><td>" + (e.glu != null ? e.glu + " " + { random: "R", fasting: "F", pp: "PP" }[e.glut] : "") +
+      '</td><td><button class="linkbtn" style="margin:0;color:var(--dim)" data-del="' + D.log.indexOf(e) + '" type="button">Remove</button></td></tr>').join("") + "</table></div>" : '<p class="small">No readings yet. Add your first one above.</p>') +
+      (spark("w", "#ffb86b") ? '<p class="small" style="margin-top:12px">Weight trend (kg)</p>' + spark("w", "#ffb86b") : "") +
+      (spark("sys", "#7fd1ff") ? '<p class="small" style="margin-top:12px">Upper blood pressure trend</p>' + spark("sys", "#7fd1ff") : "") +
+      (spark("glu", "#57d98a") ? '<p class="small" style="margin-top:12px">Sugar trend (mg/dL)</p>' + spark("glu", "#57d98a") : "");
+    for (const b of $("h_log").querySelectorAll("[data-del]")) b.onclick = () => { D.log.splice(+b.dataset.del, 1); save(); render(); };
+  }
+
+  let started = false;
+  window.RayJ = { show() { if (!started) { started = true; air(); } render(); } };
+  if (!$("healthView").hidden) window.RayJ.show(); else render();
 })();
 </script>
 </body>
